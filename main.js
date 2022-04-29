@@ -23,8 +23,8 @@ fit_canvas = () => {
     canvas.center.x = canvas_opaque.width / 2;
     canvas.center.y = canvas_opaque.height / 2;
     canvas_opaque.background();
+    draw_static_stones();
     draw_global_wireframe();
-    draw_forest();
 }
 global_scale = 12;
 global_skew = 0.7;
@@ -40,63 +40,59 @@ const isometric_map = (x, y, z) => {
     mapped.y += canvas.center.y;
     return mapped;
 }
+const flat_map = (x, y) => {
+    mapped = {};
+    mapped.x = (y / global_scale / global_skew) + (x / -global_scale / 2);
+    mapped.z = (x / -global_scale / 2) - (y / global_scale / global_skew);
+    return mapped;
+}
 const isometric_pixel = (x, y, z, size) => {
     mapped = isometric_map(x, y, z);
     if(size > 1) {ctx_opaque.fillRect(mapped.x - (size / 2), mapped.y - (size / 2), size, size)} else ctx_opaque.fillRect(mapped.x, mapped.y, 1, 1);
 }
-tree = [];
-const new_tree = (new_tree_position) => {
-    new_tree_object = {position: {x: new_tree_position.x, y: new_tree_position.y, z: new_tree_position.z}, branch: [], branches_count: []};
-    new_tree_object.top = {x: new_tree_object.position.x + (Math.random() - 0.5),
-                           y: new_tree_object.position.y + (Math.random() * 3 - 5),
-                           z: new_tree_object.position.z + (Math.random() - 0.5)}
-    tree.push(new_tree_object);
+stone = [];
+static_stone = [];
+const new_stone = (x, z) => {
+    new_stone_object = {x: x, y: -y_boundary, z: z};
+    new_stone_object.movement = {x: (Math.random() * 2 - 1) * 0.01, y: 0.1, z: (Math.random() * 2 - 1) * 0.01};
+    stone.push(new_stone_object);
 }
-const new_branch = (selected_tree, level, position) => {
-    new_branch_object = {x: position.x, y: position.y, z: position.z};
-    if(selected_tree.branch[level] === undefined) {selected_tree.branch[level] = []};
-    selected_tree.branch[level].push(new_branch_object);
-    selected_tree.branches_count[level] = selected_tree.branch[level].length;
-}
-const random_branch = (selected_tree, level) => {
-    // level = Math.ceil(Math.random() * tree.branches_count.length - 1);
-    position = {x: selected_tree.top.x + (Math.random() * 2 - 1),
-                y: selected_tree.top.y + (Math.random() * 2 - 1),
-                z: selected_tree.top.z + (Math.random() * 2 - 1)}
-    // new_branch(tree, level, position);
-    new_branch(selected_tree, level, position);
-}
-const random_tree = () => {
-    random_tree_position = {};
-    random_tree_position.x = (Math.random() * x_boundary * 2) - x_boundary;
-    random_tree_position.y = y_boundary - (Math.random() * y_boundary * 0.1);
-    random_tree_position.z = (Math.random() * z_boundary * 2) - z_boundary;
-    new_tree(random_tree_position);
-    newly_generated_tree = tree[tree.length - 1];
-    for(i = 0; i < 7; i++) {random_branch(newly_generated_tree, 0)};
-}
-const random_forest = (trees) => {
-    for(ii = 0; ii < trees; ii++) {random_tree()};
-}
-const draw_tree = (selected_tree) => {
-    mapped_tree_position = isometric_map(selected_tree.position.x, selected_tree.position.y, selected_tree.position.z);
-    mapped_tree_top = isometric_map(selected_tree.top.x, selected_tree.top.y, selected_tree.top.z);
-    ctx_opaque.strokeStyle = `#fff`;
-    ctx_opaque.beginPath();
-    ctx_opaque.moveTo(mapped_tree_position.x, mapped_tree_position.y);
-    ctx_opaque.lineTo(mapped_tree_top.x, mapped_tree_top.y);
-    ctx_opaque.stroke();
-    for(i = 0; i < 7; i++) {
-        mapped_branch = isometric_map(selected_tree.branch[0][i].x, selected_tree.branch[0][i].y, selected_tree.branch[0][i].z);
-        ctx_opaque.beginPath();
-        ctx_opaque.moveTo(mapped_tree_top.x, mapped_tree_top.y);
-        ctx_opaque.lineTo(mapped_branch.x, mapped_branch.y);
-        ctx_opaque.stroke();
+const move_stone = (stone_moved, integer) => {
+    stone_moved.movement.x += (Math.random() * 2 - 1) * 0.005;
+    // stone_moved.movement.y += 0.01;
+    stone_moved.movement.z += (Math.random() * 2 - 1) * 0.005;
+    stone_moved.x += stone_moved.movement.x;
+    stone_moved.y += stone_moved.movement.y;
+    stone_moved.z += stone_moved.movement.z;
+    if(stone_moved.x > x_boundary) {stone_moved.x = x_boundary; stone_moved.movement.x /= 2};
+    if(stone_moved.x < -x_boundary) {stone_moved.x = -x_boundary; stone_moved.movement.x /= 2};
+    if(stone_moved.z > z_boundary) {stone_moved.z = z_boundary; stone_moved.movement.z /= 2};
+    if(stone_moved.z < -z_boundary) {stone_moved.z = -z_boundary; stone_moved.movement.z /= 2};
+    if(stone_moved.y > y_boundary) {
+        stone_moved.y = y_boundary;
+        stone_moved.movement.y = 0;
+        stone.splice(integer, 1);
+        static_stone.push(stone_moved);
+        ctx_opaque.fillStyle = `#ff0`;
+        mapped = isometric_map(stone_moved.x, stone_moved.y, stone_moved.z);
+        ctx_opaque.fillRect(mapped.x, mapped.y, 1, 1);
     }
 }
-const draw_forest = () => {
-    for(ii = 0; ii < tree.length - 1; ii++) {
-        draw_tree(tree[ii]);
+const move_stones = () => {
+    for(i = 0; i < stone.length; i++) move_stone(stone[i], i);
+}
+const draw_stones = () => {
+    for(i = 0; i < stone.length; i++) {
+        ctx_transparent.fillStyle = `#ff0`;
+        mapped = isometric_map(stone[i].x, stone[i].y, stone[i].z);
+        ctx_transparent.fillRect(mapped.x, mapped.y, 1, 1);
+    }
+}
+const draw_static_stones = () => {
+    for(i = 0; i < static_stone.length; i++) {
+        ctx_opaque.fillStyle = `#ff0`;
+        mapped = isometric_map(static_stone[i].x, static_stone[i].y, static_stone[i].z);
+        ctx_opaque.fillRect(mapped.x, mapped.y, 1, 1);
     }
 }
 pix = {x: 0, y: 0, z: 0};
@@ -124,7 +120,7 @@ const move_pix = () => {
     if(pix.movement.z < -pix_movement_cap) pix.movement.z = -pix_movement_cap;
 }
 const draw_pix = () => {
-    ctx_opaque.fillStyle = `#f68`;
+    ctx_opaque.fillStyle = `#f0f`;
     isometric_pixel(pix.x, pix.y, pix.z, 1);
 }
 const draw_axis = (x, y, z) => {
@@ -207,21 +203,62 @@ forest_drawn = false;
 const sub_time = () => {
     ctx_transparent.clearRect(0, 0, canvas.width, canvas.height);
     // move_pix();
+    // mapped_cursor = flat_map(cursor_x, cursor_y + canvas.center.y / 2);
+    // if(!(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
+    //     new_stone(mapped_cursor.x, mapped_cursor.z);
+    // }
+    // if(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary) {
+    //     if(mapped_cursor.x < -x_boundary) mapped_cursor.x = -x_boundary;
+    //     if(mapped_cursor.x > x_boundary) mapped_cursor.x = x_boundary;
+    //     if(mapped_cursor.z < -z_boundary) mapped_cursor.z = -z_boundary;
+    //     if(mapped_cursor.z > z_boundary) mapped_cursor.z = z_boundary;
+    //     mapped_cursor = isometric_map(mapped_cursor.x, -y_boundary, mapped_cursor.z);
+    //     ctx_transparent.strokeStyle = `#5af`;
+    //     ctx_transparent.beginPath();
+    //     // ctx_transparent.moveTo(mapped_stone.x, mapped_stone.y);
+    //     ctx_transparent.moveTo(mapped_cursor.x, mapped_cursor.y);
+    //     ctx_transparent.lineTo(canvas.center.x + cursor_x, canvas.center.y + cursor_y);
+    //     ctx_transparent.stroke();
+    // } else {
+    //     new_stone(mapped_cursor.x, mapped_cursor.z);
+    // }
+    move_stones();
     // draw_pix();
     // draw_axis(pix.x, pix.y, pix.z);
-    if(tree.length < 100) {
-        random_tree();
-    } else if(!forest_drawn) {
-        draw_forest();
-        forest_drawn = true;
-    }
+    draw_stones();
 }
 const time = () => {
     window.requestAnimationFrame(time);
     sub_time();
 }
+cursor_x = 0;
+cursor_y = 0;
+canvas_transparent.addEventListener(`mousedown`, e => {
+    cursor_x = e.clientX - canvas.center.x;
+    cursor_y = e.clientY - canvas.center.y;
+    if(e.button === 0) {
+        // pix.x = flat_map(cursor_x, cursor_y + canvas.center.y / 2).x;
+        // pix.y = -y_boundary;
+        // pix.z = flat_map(cursor_x, cursor_y + canvas.center.y / 2).z;
+        mapped_cursor = flat_map(cursor_x, cursor_y + canvas.center.y / 2);
+        if(!(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
+            new_stone(mapped_cursor.x, mapped_cursor.z);
+        }
+    } else if(e.button === 2) {
+    }
+})
+canvas_transparent.addEventListener(`mouseup`, e => {
+    cursor_x = e.clientX - canvas.center.x;
+    cursor_y = e.clientY - canvas.center.y;
+    if(e.button === 0) {
+    } else if(e.button === 2) {
+    }
+})
+canvas_transparent.addEventListener(`mousemove`, e => {
+    cursor_x = e.clientX - canvas.center.x;
+    cursor_y = e.clientY - canvas.center.y;
+})
 window.addEventListener(`resize`, fit_canvas, false);
 fit_canvas();
 time();
 draw_global_wireframe();
-draw_forest();
