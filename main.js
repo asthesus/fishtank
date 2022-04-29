@@ -23,7 +23,7 @@ fit_canvas = () => {
     canvas.center.x = canvas_opaque.width / 2;
     canvas.center.y = canvas_opaque.height / 2;
     canvas_opaque.background();
-    draw_static_stones();
+    draw_static_foods();
     draw_global_wireframe_back();
 }
 global_scale = 12;
@@ -32,6 +32,8 @@ global_height = 1;
 x_boundary = 30;
 y_boundary = 20;
 z_boundary = 20;
+fish_starvation_cap = 50000;
+snail_starvation_cap = 200000;
 const isometric_map = (x, y, z) => {
     mapped = {};
     mapped.x = (z * -global_scale) + (x * -global_scale);
@@ -50,55 +52,55 @@ const isometric_pixel = (x, y, z, size) => {
     mapped = isometric_map(x, y, z);
     if(size > 1) {ctx_transparent.fillRect(mapped.x - (size / 2), mapped.y - (size / 2), size, size)} else ctx_transparent.fillRect(mapped.x, mapped.y, 1, 1);
 }
-stone = [];
-static_stone = [];
-const new_stone = (x, z) => {
-    new_stone_object = {x: x, y: -y_boundary, z: z};
-    new_stone_object.movement = {x: (Math.random() * 2 - 1) * 0.01, y: 0.1, z: (Math.random() * 2 - 1) * 0.01};
-    stone.push(new_stone_object);
+food = [];
+static_food = [];
+const new_food = (x, z) => {
+    new_food_object = {x: x, y: -y_boundary, z: z};
+    new_food_object.movement = {x: (Math.random() * 2 - 1) * 0.01, y: 0.005, z: (Math.random() * 2 - 1) * 0.01};
+    food.push(new_food_object);
 }
-const move_stone = (stone_moved, integer) => {
-    stone_moved.movement.x += (Math.random() * 2 - 1) * 0.001;
-    // stone_moved.movement.y += 0.01;
-    stone_moved.movement.z += (Math.random() * 2 - 1) * 0.001;
-    stone_moved.x += stone_moved.movement.x;
-    stone_moved.y += stone_moved.movement.y;
-    stone_moved.z += stone_moved.movement.z;
-    if(stone_moved.x > x_boundary) {stone_moved.x = x_boundary; stone_moved.movement.x /= 2};
-    if(stone_moved.x < -x_boundary) {stone_moved.x = -x_boundary; stone_moved.movement.x /= 2};
-    if(stone_moved.z > z_boundary) {stone_moved.z = z_boundary; stone_moved.movement.z /= 2};
-    if(stone_moved.z < -z_boundary) {stone_moved.z = -z_boundary; stone_moved.movement.z /= 2};
-    if(stone_moved.y > y_boundary) {
-        stone_moved.y = y_boundary;
-        stone_moved.movement.y = 0;
-        stone.splice(integer, 1);
-        static_stone.push(stone_moved);
+const age_food = (food_moved, integer) => {
+    food_moved.movement.x += (Math.random() * 2 - 1) * 0.001;
+    // food_moved.movement.y += 0.01;
+    food_moved.movement.z += (Math.random() * 2 - 1) * 0.001;
+    food_moved.x += food_moved.movement.x;
+    food_moved.y += food_moved.movement.y;
+    food_moved.z += food_moved.movement.z;
+    if(food_moved.x > x_boundary) {food_moved.x = x_boundary; food_moved.movement.x /= 2};
+    if(food_moved.x < -x_boundary) {food_moved.x = -x_boundary; food_moved.movement.x /= 2};
+    if(food_moved.z > z_boundary) {food_moved.z = z_boundary; food_moved.movement.z /= 2};
+    if(food_moved.z < -z_boundary) {food_moved.z = -z_boundary; food_moved.movement.z /= 2};
+    if(food_moved.y > y_boundary) {
+        food_moved.y = y_boundary;
+        food_moved.movement.y = 0;
+        food.splice(integer, 1);
+        static_food.push(food_moved);
         ctx_opaque.fillStyle = `#ff0`;
-        mapped = isometric_map(stone_moved.x, stone_moved.y, stone_moved.z);
+        mapped = isometric_map(food_moved.x, food_moved.y, food_moved.z);
         ctx_opaque.fillRect(mapped.x, mapped.y, 1, 1);
     }
 }
-const move_stones = () => {
-    for(i = 0; i < stone.length; i++) move_stone(stone[i], i);
+const age_foods = () => {
+    for(i = 0; i < food.length; i++) age_food(food[i], i);
 }
-const draw_stones = () => {
-    for(i = 0; i < stone.length; i++) {
+const draw_foods = () => {
+    for(i = 0; i < food.length; i++) {
         ctx_transparent.fillStyle = `#ff0`;
-        mapped = isometric_map(stone[i].x, stone[i].y, stone[i].z);
+        mapped = isometric_map(food[i].x, food[i].y, food[i].z);
         ctx_transparent.fillRect(mapped.x, mapped.y, 1, 1);
     }
 }
-const draw_static_stones = () => {
-    for(i = 0; i < static_stone.length; i++) {
+const draw_static_foods = () => {
+    for(i = 0; i < static_food.length; i++) {
         ctx_opaque.fillStyle = `#ff0`;
-        mapped = isometric_map(static_stone[i].x, static_stone[i].y, static_stone[i].z);
+        mapped = isometric_map(static_food[i].x, static_food[i].y, static_food[i].z);
         ctx_opaque.fillRect(mapped.x, mapped.y, 1, 1);
     }
 }
 fish = [];
 fish_movement_cap = 0.1;
 const new_fish = (x, y, z) => {
-    new_fish_object = {x: x, y: y, z: z, movement: {x: 0, y: 0, z: 0}};
+    new_fish_object = {x: x, y: y, z: z, movement: {x: 0, y: 0, z: 0}, starvation: 0, food: 0};
     fish.push(new_fish_object);
 }
 const random_fish = (quantity) => {
@@ -109,7 +111,8 @@ const random_fish = (quantity) => {
         new_fish(x, y, z);
     }
 }
-const move_fish = (fish_moved) => {
+const age_fish = (fish_moved, integer) => {
+    fish_moved.starvation++;
     fish_moved.movement.x += (Math.random() * 2 - 1) * 0.001;
     fish_moved.movement.y += (Math.random() * 2 - 1) * 0.0001;
     fish_moved.movement.z += (Math.random() * 2 - 1) * 0.001;
@@ -130,21 +133,33 @@ const move_fish = (fish_moved) => {
     if(fish_moved.movement.z > fish_movement_cap) fish_moved.movement.z = fish_movement_cap;
     if(fish_moved.movement.z < -fish_movement_cap) fish_moved.movement.z = -fish_movement_cap;
     // eat
-    for(ii = 0; ii < stone.length; ii++) {
-        if(Math.floor(fish_moved.x) === Math.floor(stone[ii].x) && Math.floor(fish_moved.y) === Math.floor(stone[ii].y) && Math.floor(fish_moved.z) === Math.floor(stone[ii].z)) {
-            stone.splice(ii, 1);
-            console.log(`nom`);
+    fed = false;
+    for(ii = 0; ii < food.length; ii++) {
+        if(Math.floor(fish_moved.x) === Math.floor(food[ii].x) && Math.floor(fish_moved.y) === Math.floor(food[ii].y) && Math.floor(fish_moved.z) === Math.floor(food[ii].z)) {
+            food.splice(ii, 1);
+            fed = true;
         }
     }
-    for(ii = 0; ii < static_stone.length; ii++) {
-        if(Math.floor(fish_moved.x) === Math.floor(static_stone[ii].x) && Math.floor(fish_moved.y) === Math.floor(static_stone[ii].y) && Math.floor(fish_moved.z) === Math.floor(static_stone[ii].z)) {
-            static_stone.splice(ii, 1);
-            console.log(`nom`);
+    for(ii = 0; ii < static_food.length; ii++) {
+        if(Math.floor(fish_moved.x) === Math.floor(static_food[ii].x) && Math.floor(fish_moved.y) === Math.floor(static_food[ii].y) && Math.floor(fish_moved.z) === Math.floor(static_food[ii].z)) {
+            static_food.splice(ii, 1);
+            fed = true;
         }
+    }
+    if(fed) {
+        fish_moved.food++;
+        fish.starvation = 0;
+    }
+    if(fed && fish_moved.food >= 3) {
+        fish_moved.food = 0;
+        new_fish(fish_moved.x, fish_moved.y, fish_moved.z);
+    }
+    if(fish_moved.starvation >= fish_starvation_cap) {
+        if(fish_moved.food > 0) {fish_moved.food--} else fish.splice(integer, 1);
     }
 }
-const move_fishes = () => {
-    for(i = 0; i < fish.length; i++) move_fish(fish[i]);
+const age_fishes = () => {
+    for(i = 0; i < fish.length; i++) age_fish(fish[i], i);
 }
 const draw_fish = (integer) => {
     ctx_transparent.fillStyle = `#36f`;
@@ -152,6 +167,72 @@ const draw_fish = (integer) => {
 }
 const draw_fishes = () => {
     for(i = 0; i < fish.length; i++) draw_fish(i);
+}
+snail = [];
+snail_movement_cap = 0.01;
+const new_snail = (x, z) => {
+    new_snail_object = {x: x, z: z, movement: {x: 0, y: 0, z: 0}, starvation: 0, food: 0};
+    snail.push(new_snail_object);
+}
+const random_snail = (quantity) => {
+    for(i = 0; i < quantity; i++) {
+        x = Math.random() * x_boundary * 2 - x_boundary;
+        y = Math.random() * y_boundary * 2 - y_boundary;
+        z = Math.random() * z_boundary * 2 - z_boundary;
+        new_snail(x, y, z);
+    }
+}
+const age_snail = (snail_moved, integer) => {
+    snail_moved.starvation++;
+    snail_moved.movement.x += (Math.random() * 2 - 1) * 0.0001;
+    snail_moved.movement.z += (Math.random() * 2 - 1) * 0.0001;
+    snail_moved.x += snail_moved.movement.x;
+    snail_moved.y += snail_moved.movement.y;
+    snail_moved.z += snail_moved.movement.z;
+    ctx_opaque.fillStyle = `#44f`;
+    if(snail_moved.x > x_boundary) {snail_moved.x = x_boundary; snail_moved.movement.x /= 2};
+    if(snail_moved.x < -x_boundary) {snail_moved.x = -x_boundary; snail_moved.movement.x /= 2};
+    if(snail_moved.z > z_boundary) {snail_moved.z = z_boundary; snail_moved.movement.z /= 2};
+    if(snail_moved.z < -z_boundary) {snail_moved.z = -z_boundary; snail_moved.movement.z /= 2};
+    if(snail_moved.movement.x > snail_movement_cap) snail_moved.movement.x = snail_movement_cap;
+    if(snail_moved.movement.x < -snail_movement_cap) snail_moved.movement.x = -snail_movement_cap;
+    if(snail_moved.movement.z > snail_movement_cap) snail_moved.movement.z = snail_movement_cap;
+    if(snail_moved.movement.z < -snail_movement_cap) snail_moved.movement.z = -snail_movement_cap;
+    // eat
+    fed = false;
+    for(ii = 0; ii < food.length; ii++) {
+        if(Math.floor(snail_moved.x) === Math.floor(food[ii].x) && food[ii].y === y_boundary && Math.floor(snail_moved.z) === Math.floor(food[ii].z)) {
+            food.splice(ii, 1);
+            fed = true;
+        }
+    }
+    for(ii = 0; ii < static_food.length; ii++) {
+        if(Math.floor(snail_moved.x) === Math.floor(static_food[ii].x) && static_food[ii].y === y_boundary && Math.floor(snail_moved.z) === Math.floor(static_food[ii].z)) {
+            static_food.splice(ii, 1);
+            fed = true;
+        }
+    }
+    if(fed) {
+        snail_moved.food++;
+        snail.starvation = 0;
+    }
+    if(fed && snail_moved.food >= 3) {
+        snail_moved.food = 0;
+        new_snail(snail_moved.x, snail_moved.z);
+    }
+    if(snail_moved.starvation >= snail_starvation_cap) {
+        if(snail_moved.food > 0) {snail_moved.food--} else snail.splice(integer, 1);
+    }
+}
+const age_snails = () => {
+    for(i = 0; i < snail.length; i++) age_snail(snail[i], i);
+}
+const draw_snail = (integer) => {
+    ctx_transparent.fillStyle = `#272`;
+    isometric_pixel(snail[integer].x, y_boundary, snail[integer].z, 2);
+}
+const draw_snails = () => {
+    for(i = 0; i < snail.length; i++) draw_snail(i);
 }
 const draw_axis = (x, y, z) => {
     x_axis_start = isometric_map(-x_boundary, y, z);
@@ -238,10 +319,9 @@ const draw_global_wireframe_front = () => {
 forest_drawn = false;
 const sub_time = () => {
     ctx_transparent.clearRect(0, 0, canvas.width, canvas.height);
-    // move_fish();
     mapped_cursor = flat_map(cursor_x, cursor_y + canvas.center.y / 2);
     if(!(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
-        new_stone(mapped_cursor.x, mapped_cursor.z);
+        new_food(mapped_cursor.x, mapped_cursor.z);
     }
     // if(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary) {
     //     if(mapped_cursor.x < -x_boundary) mapped_cursor.x = -x_boundary;
@@ -251,19 +331,19 @@ const sub_time = () => {
     //     mapped_cursor = isometric_map(mapped_cursor.x, -y_boundary, mapped_cursor.z);
     //     ctx_transparent.strokeStyle = `#5af`;
     //     ctx_transparent.beginPath();
-    //     // ctx_transparent.moveTo(mapped_stone.x, mapped_stone.y);
+    //     // ctx_transparent.moveTo(mapped_food.x, mapped_food.y);
     //     ctx_transparent.moveTo(mapped_cursor.x, mapped_cursor.y);
     //     ctx_transparent.lineTo(canvas.center.x + cursor_x, canvas.center.y + cursor_y);
     //     ctx_transparent.stroke();
     // } else {
-    //     new_stone(mapped_cursor.x, mapped_cursor.z);
+    //     new_food(mapped_cursor.x, mapped_cursor.z);
     // }
-    move_stones();
-    move_fishes();
-    // draw_fish();
-    // draw_axis(fish.x, fish.y, fish.z);
+    age_foods();
+    age_fishes();
+    age_snails();
     draw_fishes();
-    draw_stones();
+    draw_foods();
+    draw_snails();
     draw_global_wireframe_front();
 }
 const time = () => {
@@ -281,7 +361,7 @@ canvas_transparent.addEventListener(`mousedown`, e => {
         // fish.z = flat_map(cursor_x, cursor_y + canvas.center.y / 2).z;
         mapped_cursor = flat_map(cursor_x, cursor_y + canvas.center.y / 2);
         if(!(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
-            new_stone(mapped_cursor.x, mapped_cursor.z);
+            new_food(mapped_cursor.x, mapped_cursor.z);
         }
     } else if(e.button === 2) {
     }
@@ -300,5 +380,6 @@ canvas_transparent.addEventListener(`mousemove`, e => {
 window.addEventListener(`resize`, fit_canvas, false);
 fit_canvas();
 random_fish(100);
+random_snail(100);
 time();
 draw_global_wireframe_back();
