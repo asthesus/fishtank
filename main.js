@@ -28,7 +28,7 @@ fit_canvas = () => {
 global_scale = 12;
 global_skew = 0.7;
 global_height = 1;
-x_boundary = 20;
+x_boundary = 30;
 y_boundary = 20;
 z_boundary = 20;
 const isometric_map = (x, y, z) => {
@@ -158,16 +158,20 @@ const draw_global_wireframe = () => {
     g_mapped = isometric_map(-x_boundary, -y_boundary, -z_boundary);
     h_mapped = isometric_map(-x_boundary, -y_boundary, z_boundary);
     ctx_opaque.beginPath();
+    ctx_opaque.moveTo(a_mapped.x, a_mapped.y);
+    ctx_opaque.lineTo(e_mapped.x, e_mapped.y);
+    ctx_opaque.stroke();
+    ctx_opaque.beginPath();
     ctx_opaque.moveTo(b_mapped.x, b_mapped.y);
-    ctx_opaque.lineTo(h_mapped.x, h_mapped.y);
+    ctx_opaque.lineTo(f_mapped.x, f_mapped.y);
     ctx_opaque.stroke();
     ctx_opaque.beginPath();
     ctx_opaque.moveTo(c_mapped.x, c_mapped.y);
     ctx_opaque.lineTo(g_mapped.x, g_mapped.y);
     ctx_opaque.stroke();
     ctx_opaque.beginPath();
-    ctx_opaque.moveTo(a_mapped.x, a_mapped.y);
-    ctx_opaque.lineTo(e_mapped.x, e_mapped.y);
+    ctx_opaque.moveTo(d_mapped.x, d_mapped.y);
+    ctx_opaque.lineTo(h_mapped.x, h_mapped.y);
     ctx_opaque.stroke();
     // top
     ctx_opaque.beginPath();
