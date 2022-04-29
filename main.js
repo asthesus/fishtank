@@ -58,9 +58,9 @@ const new_stone = (x, z) => {
     stone.push(new_stone_object);
 }
 const move_stone = (stone_moved, integer) => {
-    stone_moved.movement.x += (Math.random() * 2 - 1) * 0.005;
+    stone_moved.movement.x += (Math.random() * 2 - 1) * 0.001;
     // stone_moved.movement.y += 0.01;
-    stone_moved.movement.z += (Math.random() * 2 - 1) * 0.005;
+    stone_moved.movement.z += (Math.random() * 2 - 1) * 0.001;
     stone_moved.x += stone_moved.movement.x;
     stone_moved.y += stone_moved.movement.y;
     stone_moved.z += stone_moved.movement.z;
@@ -203,10 +203,10 @@ forest_drawn = false;
 const sub_time = () => {
     ctx_transparent.clearRect(0, 0, canvas.width, canvas.height);
     // move_pix();
-    // mapped_cursor = flat_map(cursor_x, cursor_y + canvas.center.y / 2);
-    // if(!(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
-    //     new_stone(mapped_cursor.x, mapped_cursor.z);
-    // }
+    mapped_cursor = flat_map(cursor_x, cursor_y + canvas.center.y / 2);
+    if(!(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
+        new_stone(mapped_cursor.x, mapped_cursor.z);
+    }
     // if(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary) {
     //     if(mapped_cursor.x < -x_boundary) mapped_cursor.x = -x_boundary;
     //     if(mapped_cursor.x > x_boundary) mapped_cursor.x = x_boundary;
