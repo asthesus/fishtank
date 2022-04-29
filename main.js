@@ -131,13 +131,13 @@ const move_fish = (fish_moved) => {
     if(fish_moved.movement.z < -fish_movement_cap) fish_moved.movement.z = -fish_movement_cap;
     // eat
     for(ii = 0; ii < stone.length; ii++) {
-        if(fish_moved.x === stone[ii].x && fish_moved.y === stone[ii].y && fish_moved.z === stone[ii].z) {
+        if(Math.floor(fish_moved.x) === Math.floor(stone[ii].x) && Math.floor(fish_moved.y) === Math.floor(stone[ii].y) && Math.floor(fish_moved.z) === Math.floor(stone[ii].z)) {
             stone.splice(ii, 1);
             console.log(`nom`);
         }
     }
     for(ii = 0; ii < static_stone.length; ii++) {
-        if(fish_moved.x === static_stone[ii].x && fish_moved.y === static_stone[ii].y && fish_moved.z === static_stone[ii].z) {
+        if(Math.floor(fish_moved.x) === Math.floor(static_stone[ii].x) && Math.floor(fish_moved.y) === Math.floor(static_stone[ii].y) && Math.floor(fish_moved.z) === Math.floor(static_stone[ii].z)) {
             static_stone.splice(ii, 1);
             console.log(`nom`);
         }
