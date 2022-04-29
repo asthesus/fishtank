@@ -24,7 +24,7 @@ fit_canvas = () => {
     canvas.center.y = canvas_opaque.height / 2;
     canvas_opaque.background();
     draw_static_stones();
-    draw_global_wireframe();
+    draw_global_wireframe_back();
 }
 global_scale = 12;
 global_skew = 0.7;
@@ -48,7 +48,7 @@ const flat_map = (x, y) => {
 }
 const isometric_pixel = (x, y, z, size) => {
     mapped = isometric_map(x, y, z);
-    if(size > 1) {ctx_opaque.fillRect(mapped.x - (size / 2), mapped.y - (size / 2), size, size)} else ctx_opaque.fillRect(mapped.x, mapped.y, 1, 1);
+    if(size > 1) {ctx_transparent.fillRect(mapped.x - (size / 2), mapped.y - (size / 2), size, size)} else ctx_transparent.fillRect(mapped.x, mapped.y, 1, 1);
 }
 stone = [];
 static_stone = [];
@@ -95,33 +95,63 @@ const draw_static_stones = () => {
         ctx_opaque.fillRect(mapped.x, mapped.y, 1, 1);
     }
 }
-pix = {x: 0, y: 0, z: 0};
-pix.movement = {x: 0, y: 0, z: 0};
-pix_movement_cap = 1;
-const move_pix = () => {
-    pix.movement.x += (Math.random() * 2 - 1) * 0.01;
-    pix.movement.y += (Math.random() * 2 - 1) * 0.01;
-    pix.movement.z += (Math.random() * 2 - 1) * 0.01;
-    pix.x += pix.movement.x;
-    pix.y += pix.movement.y;
-    pix.z += pix.movement.z;
-    ctx_opaque.fillStyle = `#44f`;
-    if(pix.x > x_boundary) {pix.x = x_boundary; pix.movement.x /= 2};
-    if(pix.x < -x_boundary) {pix.x = -x_boundary; pix.movement.x /= 2};
-    if(pix.y > y_boundary) {pix.y = y_boundary; pix.movement.y /= 2};
-    if(pix.y < -y_boundary) {pix.y = -y_boundary; pix.movement.y /= 2};
-    if(pix.z > z_boundary) {pix.z = z_boundary; pix.movement.z /= 2};
-    if(pix.z < -z_boundary) {pix.z = -z_boundary; pix.movement.z /= 2};
-    if(pix.movement.x > pix_movement_cap) pix.movement.x = pix_movement_cap;
-    if(pix.movement.x < -pix_movement_cap) pix.movement.x = -pix_movement_cap;
-    if(pix.movement.y > pix_movement_cap) pix.movement.y = pix_movement_cap;
-    if(pix.movement.y < -pix_movement_cap) pix.movement.y = -pix_movement_cap;
-    if(pix.movement.z > pix_movement_cap) pix.movement.z = pix_movement_cap;
-    if(pix.movement.z < -pix_movement_cap) pix.movement.z = -pix_movement_cap;
+fish = [];
+fish_movement_cap = 0.1;
+const new_fish = (x, y, z) => {
+    new_fish_object = {x: x, y: y, z: z, movement: {x: 0, y: 0, z: 0}};
+    fish.push(new_fish_object);
 }
-const draw_pix = () => {
-    ctx_opaque.fillStyle = `#f0f`;
-    isometric_pixel(pix.x, pix.y, pix.z, 1);
+const random_fish = (quantity) => {
+    for(i = 0; i < quantity; i++) {
+        x = Math.random() * x_boundary * 2 - x_boundary;
+        y = Math.random() * y_boundary * 2 - y_boundary;
+        z = Math.random() * z_boundary * 2 - z_boundary;
+        new_fish(x, y, z);
+    }
+}
+const move_fish = (fish_moved) => {
+    fish_moved.movement.x += (Math.random() * 2 - 1) * 0.001;
+    fish_moved.movement.y += (Math.random() * 2 - 1) * 0.0001;
+    fish_moved.movement.z += (Math.random() * 2 - 1) * 0.001;
+    fish_moved.x += fish_moved.movement.x;
+    fish_moved.y += fish_moved.movement.y;
+    fish_moved.z += fish_moved.movement.z;
+    ctx_opaque.fillStyle = `#44f`;
+    if(fish_moved.x > x_boundary) {fish_moved.x = x_boundary; fish_moved.movement.x /= 2};
+    if(fish_moved.x < -x_boundary) {fish_moved.x = -x_boundary; fish_moved.movement.x /= 2};
+    if(fish_moved.y > y_boundary) {fish_moved.y = y_boundary; fish_moved.movement.y /= 2};
+    if(fish_moved.y < -y_boundary) {fish_moved.y = -y_boundary; fish_moved.movement.y /= 2};
+    if(fish_moved.z > z_boundary) {fish_moved.z = z_boundary; fish_moved.movement.z /= 2};
+    if(fish_moved.z < -z_boundary) {fish_moved.z = -z_boundary; fish_moved.movement.z /= 2};
+    if(fish_moved.movement.x > fish_movement_cap) fish_moved.movement.x = fish_movement_cap;
+    if(fish_moved.movement.x < -fish_movement_cap) fish_moved.movement.x = -fish_movement_cap;
+    if(fish_moved.movement.y > fish_movement_cap) fish_moved.movement.y = fish_movement_cap;
+    if(fish_moved.movement.y < -fish_movement_cap) fish_moved.movement.y = -fish_movement_cap;
+    if(fish_moved.movement.z > fish_movement_cap) fish_moved.movement.z = fish_movement_cap;
+    if(fish_moved.movement.z < -fish_movement_cap) fish_moved.movement.z = -fish_movement_cap;
+    // eat
+    for(ii = 0; ii < stone.length; ii++) {
+        if(fish_moved.x === stone[ii].x && fish_moved.y === stone[ii].y && fish_moved.z === stone[ii].z) {
+            stone.splice(ii, 1);
+            console.log(`nom`);
+        }
+    }
+    for(ii = 0; ii < static_stone.length; ii++) {
+        if(fish_moved.x === static_stone[ii].x && fish_moved.y === static_stone[ii].y && fish_moved.z === static_stone[ii].z) {
+            static_stone.splice(ii, 1);
+            console.log(`nom`);
+        }
+    }
+}
+const move_fishes = () => {
+    for(i = 0; i < fish.length; i++) move_fish(fish[i]);
+}
+const draw_fish = (integer) => {
+    ctx_transparent.fillStyle = `#36f`;
+    isometric_pixel(fish[integer].x, fish[integer].y, fish[integer].z, 2);
+}
+const draw_fishes = () => {
+    for(i = 0; i < fish.length; i++) draw_fish(i);
 }
 const draw_axis = (x, y, z) => {
     x_axis_start = isometric_map(-x_boundary, y, z);
@@ -146,7 +176,7 @@ const draw_axis = (x, y, z) => {
     ctx_transparent.lineTo(z_axis_end.x, z_axis_end.y);
     ctx_transparent.stroke();
 }
-const draw_global_wireframe = () => {
+const draw_global_wireframe_back = () => {
     //     h
     //     .
     // g.     .e
@@ -171,16 +201,11 @@ const draw_global_wireframe = () => {
     ctx_opaque.stroke();
     // columns
     e_mapped = isometric_map(x_boundary, -y_boundary, z_boundary);
-    f_mapped = isometric_map(x_boundary, -y_boundary, -z_boundary);
     g_mapped = isometric_map(-x_boundary, -y_boundary, -z_boundary);
     h_mapped = isometric_map(-x_boundary, -y_boundary, z_boundary);
     ctx_opaque.beginPath();
     ctx_opaque.moveTo(a_mapped.x, a_mapped.y);
     ctx_opaque.lineTo(e_mapped.x, e_mapped.y);
-    ctx_opaque.stroke();
-    ctx_opaque.beginPath();
-    ctx_opaque.moveTo(b_mapped.x, b_mapped.y);
-    ctx_opaque.lineTo(f_mapped.x, f_mapped.y);
     ctx_opaque.stroke();
     ctx_opaque.beginPath();
     ctx_opaque.moveTo(c_mapped.x, c_mapped.y);
@@ -190,19 +215,30 @@ const draw_global_wireframe = () => {
     ctx_opaque.moveTo(d_mapped.x, d_mapped.y);
     ctx_opaque.lineTo(h_mapped.x, h_mapped.y);
     ctx_opaque.stroke();
+}
+const draw_global_wireframe_front = () => {
+    // columns
+    b_mapped = isometric_map(x_boundary, y_boundary, -z_boundary);
+    e_mapped = isometric_map(x_boundary, -y_boundary, z_boundary);
+    f_mapped = isometric_map(x_boundary, -y_boundary, -z_boundary);
+    g_mapped = isometric_map(-x_boundary, -y_boundary, -z_boundary);
+    h_mapped = isometric_map(-x_boundary, -y_boundary, z_boundary);
+    ctx_transparent.strokeStyle = `#555`;
+    ctx_transparent.beginPath();
+    ctx_transparent.moveTo(b_mapped.x, b_mapped.y);
+    ctx_transparent.lineTo(f_mapped.x, f_mapped.y);
+    ctx_transparent.stroke();
     // top
-    ctx_opaque.beginPath();
-    ctx_opaque.moveTo(e_mapped.x, e_mapped.y);
-    ctx_opaque.lineTo(f_mapped.x, f_mapped.y);
-    ctx_opaque.lineTo(g_mapped.x, g_mapped.y);
-    ctx_opaque.lineTo(h_mapped.x, h_mapped.y);
-    ctx_opaque.lineTo(e_mapped.x, e_mapped.y);
-    ctx_opaque.stroke();
+    ctx_transparent.lineTo(e_mapped.x, e_mapped.y);
+    ctx_transparent.lineTo(h_mapped.x, h_mapped.y);
+    ctx_transparent.lineTo(g_mapped.x, g_mapped.y);
+    ctx_transparent.lineTo(f_mapped.x, f_mapped.y);
+    ctx_transparent.stroke();
 }
 forest_drawn = false;
 const sub_time = () => {
     ctx_transparent.clearRect(0, 0, canvas.width, canvas.height);
-    // move_pix();
+    // move_fish();
     mapped_cursor = flat_map(cursor_x, cursor_y + canvas.center.y / 2);
     if(!(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
         new_stone(mapped_cursor.x, mapped_cursor.z);
@@ -223,9 +259,12 @@ const sub_time = () => {
     //     new_stone(mapped_cursor.x, mapped_cursor.z);
     // }
     move_stones();
-    // draw_pix();
-    // draw_axis(pix.x, pix.y, pix.z);
+    move_fishes();
+    // draw_fish();
+    // draw_axis(fish.x, fish.y, fish.z);
+    draw_fishes();
     draw_stones();
+    draw_global_wireframe_front();
 }
 const time = () => {
     window.requestAnimationFrame(time);
@@ -237,9 +276,9 @@ canvas_transparent.addEventListener(`mousedown`, e => {
     cursor_x = e.clientX - canvas.center.x;
     cursor_y = e.clientY - canvas.center.y;
     if(e.button === 0) {
-        // pix.x = flat_map(cursor_x, cursor_y + canvas.center.y / 2).x;
-        // pix.y = -y_boundary;
-        // pix.z = flat_map(cursor_x, cursor_y + canvas.center.y / 2).z;
+        // fish.x = flat_map(cursor_x, cursor_y + canvas.center.y / 2).x;
+        // fish.y = -y_boundary;
+        // fish.z = flat_map(cursor_x, cursor_y + canvas.center.y / 2).z;
         mapped_cursor = flat_map(cursor_x, cursor_y + canvas.center.y / 2);
         if(!(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
             new_stone(mapped_cursor.x, mapped_cursor.z);
@@ -260,5 +299,6 @@ canvas_transparent.addEventListener(`mousemove`, e => {
 })
 window.addEventListener(`resize`, fit_canvas, false);
 fit_canvas();
+random_fish(100);
 time();
-draw_global_wireframe();
+draw_global_wireframe_back();
