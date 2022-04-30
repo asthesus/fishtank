@@ -37,7 +37,7 @@ fit_canvas = () => {
 global_scale = 12;
 global_skew = 0.7;
 global_height = 1;
-x_boundary = 20;
+x_boundary = 30;
 y_boundary = 20;
 z_boundary = 20;
 fish_starvation_cap = 50000;
