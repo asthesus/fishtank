@@ -17,9 +17,11 @@ ctx_transparent.lineWidth = 1;
 background = `#0a0a0a`;
 foreground = `#aaa`;
 canvas = {width: 0, height: 0, center: {x: 0, y: 0}};
-canvas_opaque.background = () => {
+draw_background = () => {
     ctx_opaque.fillStyle = background;
     ctx_opaque.fillRect(0, 0, canvas_opaque.width, canvas_opaque.height);
+    draw_floor();
+    draw_global_wireframe_back();
 }
 fit_canvas = () => {
     canvas_opaque.width = window.innerWidth;
@@ -30,13 +32,12 @@ fit_canvas = () => {
     canvas.height = window.innerHeight;
     canvas.center.x = canvas_opaque.width / 2;
     canvas.center.y = canvas_opaque.height / 2;
-    canvas_opaque.background();
-    draw_static_foods();
-    draw_global_wireframe_back();
+    draw_background();
 }
 global_scale = 12;
 global_skew = 0.7;
 global_height = 1;
+global_gravity = 0.000001;
 x_boundary = 30;
 y_boundary = 20;
 z_boundary = 20;
@@ -60,6 +61,47 @@ const isometric_pixel = (x, y, z, size) => {
     mapped = isometric_map(x, y, z);
     if(size > 1) {ctx_transparent.fillRect(mapped.x - (size / 2), mapped.y - (size / 2), size, size)} else ctx_transparent.fillRect(mapped.x, mapped.y, 1, 1);
 }
+const draw_floor = () => {
+    a_mapped = isometric_map(x_boundary, y_boundary, z_boundary);
+    b_mapped = isometric_map(x_boundary, y_boundary, -z_boundary);
+    c_mapped = isometric_map(-x_boundary, y_boundary, -z_boundary);
+    d_mapped = isometric_map(-x_boundary, y_boundary, z_boundary);
+    ctx_opaque.fillStyle = `#120801`;
+    ctx_opaque.beginPath();
+    ctx_opaque.moveTo(a_mapped.x, a_mapped.y);
+    ctx_opaque.lineTo(b_mapped.x, b_mapped.y);
+    ctx_opaque.lineTo(c_mapped.x, c_mapped.y);
+    ctx_opaque.lineTo(d_mapped.x, d_mapped.y);
+    ctx_opaque.lineTo(a_mapped.x, a_mapped.y);
+    ctx_opaque.fill();
+}
+const draw_water = () => {
+    //     h
+    //     .
+    // g.     .e
+    //     .f
+    //     
+    //     .d
+    // c.     .a
+    //     .
+    //     b
+    a_mapped = isometric_map(x_boundary, y_boundary, z_boundary);
+    b_mapped = isometric_map(x_boundary, y_boundary, -z_boundary);
+    c_mapped = isometric_map(-x_boundary, y_boundary, -z_boundary);
+    e_mapped = isometric_map(x_boundary, -y_boundary, z_boundary);
+    g_mapped = isometric_map(-x_boundary, -y_boundary, -z_boundary);
+    h_mapped = isometric_map(-x_boundary, -y_boundary, z_boundary);
+    ctx_transparent.fillStyle = `#0636ff09`;
+    ctx_transparent.beginPath();
+    ctx_transparent.moveTo(a_mapped.x, a_mapped.y);
+    ctx_transparent.lineTo(b_mapped.x, b_mapped.y);
+    ctx_transparent.lineTo(c_mapped.x, c_mapped.y);
+    ctx_transparent.lineTo(g_mapped.x, g_mapped.y);
+    ctx_transparent.lineTo(h_mapped.x, h_mapped.y);
+    ctx_transparent.lineTo(e_mapped.x, e_mapped.y);
+    ctx_transparent.lineTo(a_mapped.x, a_mapped.y);
+    ctx_transparent.fill();
+}
 food = [];
 static_food = [];
 const new_food = (x, z) => {
@@ -69,7 +111,7 @@ const new_food = (x, z) => {
 }
 const age_food = (food_moved, integer) => {
     food_moved.movement.x += (Math.random() * 2 - 1) * 0.001;
-    food_moved.movement.y += (Math.random() * 2 - 1) * 0.0001 + 0.000001;
+    food_moved.movement.y += (Math.random() * 2 - 1) * 0.0001 + global_gravity;
     food_moved.movement.z += (Math.random() * 2 - 1) * 0.001;
     food_moved.x += food_moved.movement.x;
     food_moved.y += food_moved.movement.y;
@@ -97,12 +139,10 @@ const draw_foods = () => {
         mapped = isometric_map(food[i].x, food[i].y, food[i].z);
         ctx_transparent.fillRect(mapped.x, mapped.y, 1, 1);
     }
-}
-const draw_static_foods = () => {
     for(i = 0; i < static_food.length; i++) {
-        ctx_opaque.fillStyle = `#660`;
-        mapped = isometric_map(static_food[i].x, static_food[i].y, static_food[i].z);
-        ctx_opaque.fillRect(mapped.x, mapped.y, 1, 1);
+        ctx_transparent.fillStyle = `#660`;
+        mapped = isometric_map(static_food[i].x, y_boundary, static_food[i].z);
+        ctx_transparent.fillRect(mapped.x, mapped.y, 1, 1);
     }
 }
 fish = [];
@@ -212,14 +252,9 @@ const age_snail = (snail_moved, integer) => {
     if(snail_moved.movement.z < -snail_movement_cap) snail_moved.movement.z = -snail_movement_cap;
     // eat
     fed = false;
-    for(ii = 0; ii < food.length; ii++) {
-        if(Math.floor(snail_moved.x) === Math.floor(food[ii].x) && food[ii].y === y_boundary && Math.floor(snail_moved.z) === Math.floor(food[ii].z)) {
-            food.splice(ii, 1);
-            fed = true;
-        }
-    }
     for(ii = 0; ii < static_food.length; ii++) {
-        if(Math.floor(snail_moved.x) === Math.floor(static_food[ii].x) && static_food[ii].y === y_boundary && Math.floor(snail_moved.z) === Math.floor(static_food[ii].z)) {
+        distance_from_food = Math.sqrt((Math.abs(snail_moved.x - static_food[ii].x) ** 2) + (Math.abs(snail_moved.z - static_food[ii].z) ** 2));
+        if(distance_from_food <= 0.1) {
             static_food.splice(ii, 1);
             fed = true;
         }
@@ -284,9 +319,9 @@ const draw_snail = (integer) => {
     ctx_transparent.drawImage(snail_image, mapped.x - 16, mapped.y - 24);
     // ctx_transparent.fillStyle = `#272`;
     // isometric_pixel(snail[integer].x, y_boundary, snail[integer].z, 2);
-    // ctx_opaque.fillStyle = `#011001`;
-    // mapped = isometric_map(snail[integer].x, y_boundary, snail[integer].z);
-    // ctx_opaque.fillRect(mapped.x - 1, mapped.y - 1, 2, 2);
+    ctx_opaque.fillStyle = `#100600`;
+    mapped = isometric_map(snail[integer].x, y_boundary, snail[integer].z);
+    ctx_opaque.fillRect(mapped.x - 1, mapped.y - 1, 2, 2);
 }
 const draw_snails = () => {
     for(i = 0; i < snail.length; i++) draw_snail(i);
@@ -401,6 +436,7 @@ const sub_time = () => {
     draw_fishes();
     draw_foods();
     draw_snails();
+    draw_water();
     draw_global_wireframe_front();
 }
 const time = () => {
