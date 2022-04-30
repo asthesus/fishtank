@@ -195,7 +195,6 @@ const age_snail = (snail_moved, integer) => {
     snail_moved.starvation++;
     snail_moved.move_cycle++;
     if(snail_moved.move_cycle >= 100) {
-        snail_moved.move_cycle = 0;
         snail_moved.move_cycle = Math.floor(Math.random() * -50);
         snail_moved.movement.x += (Math.random() * 2 - 1) * 0.0005;
         snail_moved.movement.z += (Math.random() * 2 - 1) * 0.0005;
