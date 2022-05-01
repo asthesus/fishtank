@@ -130,6 +130,47 @@ const draw_water = () => {
     ctx_transparent.lineTo(a_mapped.x, a_mapped.y);
     ctx_transparent.fill();
 }
+bubble = [];
+bubble_movement_cap = 0.025;
+const new_bubble = (x, y, z) => {
+    new_bubble_object = {x: x, y: y, z: z, maximum: Math.ceil(Math.random() * 20), size: 2};
+    new_bubble_object.movement = {x: (Math.random() * 2 - 1) * 0.01, y: (Math.random() * 2 - 1) * 0.01, z: (Math.random() * 2 - 1) * 0.01};
+    bubble.push(new_bubble_object);
+}
+const bubble_burst = (x, y, z, number) => {for(i = 0; i < number; i++) new_bubble(x, y, z)};
+const age_bubble = (bubble_moved, integer) => {
+    if(bubble_moved.size < bubble_moved.maximum) bubble_moved.size += bubble_moved.size ** 2 * Math.random() * 0.001;
+    bubble_moved.movement.x += (Math.random() * 2 - 1) * 0.005;
+    bubble_moved.movement.y -= 0.0001 * bubble_moved.size;
+    bubble_moved.movement.z += (Math.random() * 2 - 1) * 0.005;
+    bubble_moved.x += bubble_moved.movement.x;
+    bubble_moved.y += bubble_moved.movement.y;
+    bubble_moved.z += bubble_moved.movement.z;
+    if(bubble_moved.x > x_boundary) {bubble_moved.x = x_boundary; bubble_moved.movement.x /= 2};
+    if(bubble_moved.x < -x_boundary) {bubble_moved.x = -x_boundary; bubble_moved.movement.x /= 2};
+    if(bubble_moved.y > y_boundary) {bubble_moved.y = y_boundary; bubble_moved.movement.y /= 2};
+    if(bubble_moved.y < -y_boundary) {bubble.splice(integer, 1)};
+    if(bubble_moved.z > z_boundary) {bubble_moved.z = z_boundary; bubble_moved.movement.z /= 2};
+    if(bubble_moved.z < -z_boundary) {bubble_moved.z = -z_boundary; bubble_moved.movement.z /= 2};
+    if(bubble_moved.movement.x > bubble_movement_cap) bubble_moved.movement.x = bubble_movement_cap;
+    if(bubble_moved.movement.x < -bubble_movement_cap) bubble_moved.movement.x = -bubble_movement_cap;
+    if(bubble_moved.movement.z > bubble_movement_cap) bubble_moved.movement.z = bubble_movement_cap;
+    if(bubble_moved.movement.z < -bubble_movement_cap) bubble_moved.movement.z = -bubble_movement_cap;
+}
+const age_bubbles = () => {
+    for(i = 0; i < bubble.length; i++) {
+        age_bubble(bubble[i], i);
+    }
+}
+const draw_bubbles = () => {
+    for(i = 0; i < bubble.length; i++) {
+        ctx_transparent.strokeStyle = `#70ffff70`;
+        mapped = isometric_map(bubble[i].x, bubble[i].y, bubble[i].z);
+        ctx_transparent.beginPath();
+        ctx_transparent.arc(mapped.x, mapped.y, bubble[i].size / 2, 0, Math.PI * 2);
+        ctx_transparent.stroke();
+    }
+}
 food = [];
 static_food = [];
 const new_food = (x, z) => {
@@ -228,6 +269,14 @@ const age_fish = (fish_moved, integer) => {
         distance_from_food = Math.sqrt((Math.abs(fish_moved.x - food[ii].x) ** 2) + (Math.abs(fish_moved.y - food[ii].y) ** 2) + (Math.abs(fish_moved.z - food[ii].z) ** 2));
         if(distance_from_food <= 1) {
             food.splice(ii, 1);
+            fed = true;
+            ii--;
+        }
+    }
+    for(ii = 0; ii < static_food.length; ii++) {
+        distance_from_food = Math.sqrt((Math.abs(fish_moved.x - static_food[ii].x) ** 2) + (Math.abs(fish_moved.y - static_food[ii].y) ** 2) + (Math.abs(fish_moved.z - static_food[ii].z) ** 2));
+        if(distance_from_food <= 1) {
+            static_food.splice(ii, 1);
             fed = true;
             ii--;
         }
@@ -345,6 +394,7 @@ const random_snail = (quantity) => {
 shell = [];
 const kill_snail = (integer) => {
     new_shell_object = {x: snail[integer].x, z: snail[integer].z, facing: snail[integer].movement};
+    bubble_burst(snail[integer].x, y_boundary, snail[integer].z, Math.floor(Math.random() * 3) + 2);
     shell.push(new_shell_object);
     snail.splice(integer, 1);
 }
@@ -490,17 +540,17 @@ const draw_axis = (x, y, z) => {
     y_axis_end = isometric_map(x, y_boundary, z);
     z_axis_start = isometric_map(x, y, -z_boundary);
     z_axis_end = isometric_map(x, y, z_boundary);
-    ctx_transparent.strokeStyle = `#f00`;
+    ctx_transparent.strokeStyle = `#ff000080`;
     ctx_transparent.beginPath();
     ctx_transparent.moveTo(x_axis_start.x, x_axis_start.y);
     ctx_transparent.lineTo(x_axis_end.x, x_axis_end.y);
     ctx_transparent.stroke();
-    ctx_transparent.strokeStyle = `#0f0`;
+    ctx_transparent.strokeStyle = `#00ff0080`;
     ctx_transparent.beginPath();
     ctx_transparent.moveTo(y_axis_start.x, y_axis_start.y);
     ctx_transparent.lineTo(y_axis_end.x, y_axis_end.y);
     ctx_transparent.stroke();
-    ctx_transparent.strokeStyle = `#00f`;
+    ctx_transparent.strokeStyle = `#0000ff80`;
     ctx_transparent.beginPath();
     ctx_transparent.moveTo(z_axis_start.x, z_axis_start.y);
     ctx_transparent.lineTo(z_axis_end.x, z_axis_end.y);
@@ -571,12 +621,25 @@ const draw_global_wireframe_front = () => {
     ctx_transparent.lineTo(g_mapped.x, g_mapped.y);
     ctx_transparent.stroke();
 }
-forest_drawn = false;
+player_selection = {};
+const cursor_select = () => {
+    selected_fish = 0;
+    shortest_distance = Infinity;
+    for(i = 0; i < fish.length; i++) {
+        position = isometric_map(fish[i].x, fish[i].y, fish[i].z);
+        position.x -= canvas.center.x;
+        position.y -= canvas.center.y;
+        fish_distance = Math.sqrt(Math.abs(position.x - cursor_x) ** 2 + Math.abs(position.y - cursor_y) ** 2);
+        if(fish_distance < shortest_distance) {shortest_distance = fish_distance; selected_fish = i};
+    }
+    if(shortest_distance < 16) {player_selection = fish[selected_fish]} else player_selection = {};
+}
 const sub_time = () => {
     ctx_transparent.clearRect(0, 0, canvas.width, canvas.height);
     mapped_cursor = flat_map(cursor_x, cursor_y + canvas.center.y / 2);
     if(!(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
         new_food(mapped_cursor.x, mapped_cursor.z);
+        // new_bubble(mapped_cursor.x, y_boundary, mapped_cursor.z);
     }
     // if(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary) {
     //     if(mapped_cursor.x < -x_boundary) mapped_cursor.x = -x_boundary;
@@ -593,10 +656,13 @@ const sub_time = () => {
     // } else {
     //     new_food(mapped_cursor.x, mapped_cursor.z);
     // }
-    // draw_axis(snail[0].x, y_boundary, snail[0].z);
+    if(player_selection.x !== undefined) draw_axis(player_selection.x, player_selection.y, player_selection.z);
+    
+    // new_bubble(mapped_cursor.x, y_boundary, mapped_cursor.z);
     age_foods();
     age_fishes();
     age_snails();
+    age_bubbles();
     global_tick++;
     if(global_tick >= 10000) {
         global_tick = 0;
@@ -607,6 +673,7 @@ const sub_time = () => {
     draw_snails();
     draw_foods();
     draw_fishes();
+    draw_bubbles();
     draw_water();
     draw_global_wireframe_front();
 }
@@ -626,10 +693,11 @@ canvas_transparent.addEventListener(`mousedown`, e => {
         // fish.x = flat_map(cursor_x, cursor_y + canvas.center.y / 2).x;
         // fish.y = -y_boundary;
         // fish.z = flat_map(cursor_x, cursor_y + canvas.center.y / 2).z;
-        mapped_cursor = flat_map(cursor_x, cursor_y + canvas.center.y / 2);
-        if(!(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
-            new_food(mapped_cursor.x, mapped_cursor.z);
-        }
+        // mapped_cursor = flat_map(cursor_x, cursor_y + canvas.center.y / 2);
+        // if(!(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
+        //     new_food(mapped_cursor.x, mapped_cursor.z);
+        // }
+        cursor_select();
     } else if(e.button === 2) {
     }
 })
@@ -650,6 +718,8 @@ random_fish(16);
 random_snail(4);
 time();
 draw_global_wireframe_back();
+
+// for clicking on fish: map each fish to its 2d position, then check the distances between those positions and the cursor. shortest distance under a certain distance is selected fish
 
 // allow player to pick up shells from dead snails for points
 
