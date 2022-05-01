@@ -18,6 +18,16 @@ const shell5_png = document.getElementById(`shell5_png`);
 const shell6_png = document.getElementById(`shell6_png`);
 const shell7_png = document.getElementById(`shell7_png`);
 const shell8_png = document.getElementById(`shell8_png`);
+const fish1_png = document.getElementById(`fish1_png`);
+const fish2_png = document.getElementById(`fish2_png`);
+const fish3_png = document.getElementById(`fish3_png`);
+const fish4_png = document.getElementById(`fish4_png`);
+const fish5_png = document.getElementById(`fish5_png`);
+const fish6_png = document.getElementById(`fish6_png`);
+const fish7_png = document.getElementById(`fish7_png`);
+const fish8_png = document.getElementById(`fish8_png`);
+const fish7flip_png = document.getElementById(`fish7flip_png`);
+const fish8flip_png = document.getElementById(`fish8flip_png`);
 ctx_opaque.translate(0.5, 0.5);
 ctx_opaque.lineWidth = 1;
 ctx_transparent.translate(0.5, 0.5);
@@ -115,12 +125,12 @@ food = [];
 static_food = [];
 const new_food = (x, z) => {
     new_food_object = {x: x, y: -y_boundary, z: z};
-    new_food_object.movement = {x: (Math.random() * 2 - 1) * 0.01, y: (Math.random() * 0.01) + 0.02, z: (Math.random() * 2 - 1) * 0.01};
+    new_food_object.movement = {x: (Math.random() * 2 - 1) * 0.01, y: (Math.random() * 2 - 1) * 0.01, z: (Math.random() * 2 - 1) * 0.01};
     food.push(new_food_object);
 }
 const age_food = (food_moved, integer) => {
     food_moved.movement.x += (Math.random() * 2 - 1) * 0.0001;
-    food_moved.movement.y += (Math.random() * 2 - 1) * 0.0005 + global_gravity;
+    food_moved.movement.y += (Math.random() * 2 - 1) * 0.0001 + global_gravity;
     food_moved.movement.z += (Math.random() * 2 - 1) * 0.0001;
     food_moved.x += food_moved.movement.x;
     food_moved.y += food_moved.movement.y;
@@ -153,9 +163,12 @@ const draw_foods = () => {
     }
 }
 fish = [];
-fish_movement_cap = 0.1;
+fish_movement_cap = 0.5;
 const new_fish = (x, y, z) => {
-    new_fish_object = {x: x, y: y, z: z, movement: {x: 0, y: 0, z: 0}, starvation: 0, food: 0};
+    movement_x = (Math.random() * 2 - 1) * 0.01;
+    movement_y = (Math.random() * 2 - 1) * 0.001;
+    movement_z = (Math.random() * 2 - 1) * 0.01;
+    new_fish_object = {x: x, y: y, z: z, movement: {x: movement_x, y: movement_y, z: movement_z}, starvation: 0, food: 0, move_cycle: 0, flip_cycle: 0, flip: false};
     fish.push(new_fish_object);
 }
 const random_fish = (quantity) => {
@@ -168,9 +181,18 @@ const random_fish = (quantity) => {
 }
 const age_fish = (fish_moved, integer) => {
     fish_moved.starvation++;
-    fish_moved.movement.x += (Math.random() * 2 - 1) * 0.001;
-    fish_moved.movement.y += (Math.random() * 2 - 1) * 0.0001;
-    fish_moved.movement.z += (Math.random() * 2 - 1) * 0.001;
+    fish_moved.flip_cycle++;
+    fish_moved.move_cycle++;
+    if(fish_moved.flip_cycle >= 100) {
+        fish_moved.flip_cycle = Math.floor(Math.random() * 75);
+        fish_moved.flip = !fish_moved.flip;
+    }
+    if(fish_moved.move_cycle >= 100) {
+        fish_moved.move_cycle = Math.floor(Math.random() * -50);
+        fish_moved.movement.x += (Math.random() * 2 - 1) * 0.001;
+        fish_moved.movement.y += (Math.random() * 2 - 1) * 0.0001;
+        fish_moved.movement.z += (Math.random() * 2 - 1) * 0.001;
+    }
     fish_moved.x += fish_moved.movement.x;
     fish_moved.y += fish_moved.movement.y;
     fish_moved.z += fish_moved.movement.z;
@@ -178,7 +200,7 @@ const age_fish = (fish_moved, integer) => {
     if(fish_moved.x > x_boundary) {fish_moved.x = x_boundary; fish_moved.movement.x /= 2};
     if(fish_moved.x < -x_boundary) {fish_moved.x = -x_boundary; fish_moved.movement.x /= 2};
     if(fish_moved.y > y_boundary) {fish_moved.y = y_boundary; fish_moved.movement.y /= 2};
-    if(fish_moved.y < -y_boundary) {fish_moved.y = -y_boundary; fish_moved.movement.y /= 2};
+    if(fish_moved.y < -y_boundary + y_boundary * 0.01) {fish_moved.y = -y_boundary; fish_moved.movement.y /= 2};
     if(fish_moved.z > z_boundary) {fish_moved.z = z_boundary; fish_moved.movement.z /= 2};
     if(fish_moved.z < -z_boundary) {fish_moved.z = -z_boundary; fish_moved.movement.z /= 2};
     if(fish_moved.movement.x > fish_movement_cap) fish_moved.movement.x = fish_movement_cap;
@@ -190,15 +212,9 @@ const age_fish = (fish_moved, integer) => {
     // eat
     fed = false;
     for(ii = 0; ii < food.length; ii++) {
-        if(Math.floor(fish_moved.x) === Math.floor(food[ii].x) && Math.floor(fish_moved.y) === Math.floor(food[ii].y) && Math.floor(fish_moved.z) === Math.floor(food[ii].z)) {
+        distance_from_food = Math.sqrt((Math.abs(fish_moved.x - food[ii].x) ** 2) + (Math.abs(fish_moved.y - food[ii].y) ** 2) + (Math.abs(fish_moved.z - food[ii].z) ** 2));
+        if(distance_from_food <= 1) {
             food.splice(ii, 1);
-            fed = true;
-            ii--;
-        }
-    }
-    for(ii = 0; ii < static_food.length; ii++) {
-        if(Math.floor(fish_moved.x) === Math.floor(static_food[ii].x) && Math.floor(fish_moved.y) === Math.floor(static_food[ii].y) && Math.floor(fish_moved.z) === Math.floor(static_food[ii].z)) {
-            static_food.splice(ii, 1);
             fed = true;
             ii--;
         }
@@ -219,8 +235,55 @@ const age_fishes = () => {
     for(i = 0; i < fish.length; i++) age_fish(fish[i], i);
 }
 const draw_fish = (integer) => {
-    ctx_transparent.fillStyle = `#36f`;
-    isometric_pixel(fish[integer].x, fish[integer].y, fish[integer].z, 2);
+    // ctx_transparent.fillStyle = `#36f`;
+    // isometric_pixel(fish[integer].x, fish[integer].y, fish[integer].z, 2);
+    mapped = isometric_map(fish[integer].x, fish[integer].y, fish[integer].z);
+    if(fish[i].movement.x <= 0) {
+        if(fish[i].movement.z <= 0) {
+            if(fish[i].movement.x / fish[i].movement.z <= 1) {
+                // east
+                fish_image = fish6_png;
+            } else {
+                // north east
+                fish_image = fish4_png;
+            }
+        } else {
+            if(fish[i].movement.x / fish[i].movement.z <= -1) {
+                // north
+                if(fish[i].flip) {
+                    fish_image = fish8flip_png;
+                } else {
+                    fish_image = fish8_png;
+                }
+            } else {
+                // north west
+                fish_image = fish3_png;
+            }
+        }
+    } else {
+        if(fish[i].movement.z <= 0) {
+            if(fish[i].movement.x / fish[i].movement.z <= -1) {
+                // south
+                if(fish[i].flip) {
+                    fish_image = fish7flip_png;
+                } else {
+                    fish_image = fish7_png;
+                }
+            } else {
+                // south east
+                fish_image = fish2_png;
+            }
+        } else {
+            if(fish[i].movement.x / fish[i].movement.z <= 1) {
+                // west
+                fish_image = fish5_png;
+            } else {
+                // south west
+                fish_image = fish1_png;
+            }
+        }
+    }
+    ctx_transparent.drawImage(fish_image, mapped.x - 16, mapped.y);
 }
 const draw_fishes = () => {
     for(i = 0; i < fish.length; i++) draw_fish(i);
@@ -499,10 +562,11 @@ const sub_time = () => {
         global_tick = 0;
         draw_ground(`32`);
     }
-    draw_fishes();
+    
     draw_foods();
     draw_shells();
     draw_snails();
+    draw_fishes();
     draw_water();
     draw_global_wireframe_front();
 }
@@ -539,7 +603,9 @@ canvas_transparent.addEventListener(`mousemove`, e => {
 })
 window.addEventListener(`resize`, fit_canvas, false);
 fit_canvas();
-// random_fish(100);
-random_snail(100);
+random_fish(16);
+random_snail(4);
 time();
 draw_global_wireframe_back();
+
+// use a similar gameplay loop to insane aquarium deluxe
