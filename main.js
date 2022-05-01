@@ -175,7 +175,7 @@ const draw_static_foods = () => {
 }
 fish = [];
 fish_food_requirement = 10;
-fish_movement_cap = 0.03;
+fish_movement_cap = 0.025;
 const new_fish = (x, y, z) => {
     movement_x = (Math.random() * 2 - 1) * 0.01;
     movement_y = (Math.random() * 2 - 1) * 0.001;
