@@ -26,6 +26,12 @@ const fish5_png = document.getElementById(`fish5_png`);
 const fish6_png = document.getElementById(`fish6_png`);
 const fish7_png = document.getElementById(`fish7_png`);
 const fish8_png = document.getElementById(`fish8_png`);
+const fish1flip_png = document.getElementById(`fish1flip_png`);
+const fish2flip_png = document.getElementById(`fish2flip_png`);
+const fish3flip_png = document.getElementById(`fish3flip_png`);
+const fish4flip_png = document.getElementById(`fish4flip_png`);
+const fish5flip_png = document.getElementById(`fish5flip_png`);
+const fish6flip_png = document.getElementById(`fish6flip_png`);
 const fish7flip_png = document.getElementById(`fish7flip_png`);
 const fish8flip_png = document.getElementById(`fish8flip_png`);
 ctx_opaque.translate(0.5, 0.5);
@@ -249,10 +255,18 @@ const draw_fish = (integer) => {
         if(fish[i].movement.z <= 0) {
             if(fish[i].movement.x / fish[i].movement.z <= 1) {
                 // east
-                fish_image = fish6_png;
+                if(fish[i].flip) {
+                    fish_image = fish6flip_png;
+                } else {
+                    fish_image = fish6_png;
+                }
             } else {
                 // north east
-                fish_image = fish4_png;
+                if(fish[i].flip) {
+                    fish_image = fish4flip_png;
+                } else {
+                    fish_image = fish4_png;
+                }
             }
         } else {
             if(fish[i].movement.x / fish[i].movement.z <= -1) {
@@ -264,7 +278,11 @@ const draw_fish = (integer) => {
                 }
             } else {
                 // north west
-                fish_image = fish3_png;
+                if(fish[i].flip) {
+                    fish_image = fish3flip_png;
+                } else {
+                    fish_image = fish3_png;
+                }
             }
         }
     } else {
@@ -278,15 +296,27 @@ const draw_fish = (integer) => {
                 }
             } else {
                 // south east
-                fish_image = fish2_png;
+                if(fish[i].flip) {
+                    fish_image = fish2flip_png;
+                } else {
+                    fish_image = fish2_png;
+                }
             }
         } else {
             if(fish[i].movement.x / fish[i].movement.z <= 1) {
                 // west
-                fish_image = fish5_png;
+                if(fish[i].flip) {
+                    fish_image = fish5flip_png;
+                } else {
+                    fish_image = fish5_png;
+                }
             } else {
                 // south west
-                fish_image = fish1_png;
+                if(fish[i].flip) {
+                    fish_image = fish1flip_png;
+                } else {
+                    fish_image = fish1_png;
+                }
             }
         }
     }
@@ -563,7 +593,7 @@ const sub_time = () => {
     // } else {
     //     new_food(mapped_cursor.x, mapped_cursor.z);
     // }
-    // draw_axis(fish[0].x, fish[0].y, fish[0].z);
+    // draw_axis(snail[0].x, y_boundary, snail[0].z);
     age_foods();
     age_fishes();
     age_snails();
