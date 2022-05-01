@@ -125,9 +125,6 @@ const age_food = (food_moved, integer) => {
         food_moved.movement.y = 0;
         food.splice(integer, 1);
         static_food.push(food_moved);
-        ctx_opaque.fillStyle = `#660`;
-        mapped = isometric_map(food_moved.x, food_moved.y, food_moved.z);
-        ctx_opaque.fillRect(mapped.x, mapped.y, 1, 1);
     }
 }
 const age_foods = () => {
@@ -186,12 +183,14 @@ const age_fish = (fish_moved, integer) => {
         if(Math.floor(fish_moved.x) === Math.floor(food[ii].x) && Math.floor(fish_moved.y) === Math.floor(food[ii].y) && Math.floor(fish_moved.z) === Math.floor(food[ii].z)) {
             food.splice(ii, 1);
             fed = true;
+            ii--;
         }
     }
     for(ii = 0; ii < static_food.length; ii++) {
         if(Math.floor(fish_moved.x) === Math.floor(static_food[ii].x) && Math.floor(fish_moved.y) === Math.floor(static_food[ii].y) && Math.floor(fish_moved.z) === Math.floor(static_food[ii].z)) {
             static_food.splice(ii, 1);
             fed = true;
+            ii--;
         }
     }
     if(fed) {
@@ -254,8 +253,9 @@ const age_snail = (snail_moved, integer) => {
     fed = false;
     for(ii = 0; ii < static_food.length; ii++) {
         distance_from_food = Math.sqrt((Math.abs(snail_moved.x - static_food[ii].x) ** 2) + (Math.abs(snail_moved.z - static_food[ii].z) ** 2));
-        if(distance_from_food <= 0.1) {
+        if(distance_from_food <= 0.5) {
             static_food.splice(ii, 1);
+            ii--;
             fed = true;
         }
     }
@@ -316,7 +316,7 @@ const draw_snail = (integer) => {
             }
         }
     }
-    ctx_transparent.drawImage(snail_image, mapped.x - 16, mapped.y - 24);
+    ctx_transparent.drawImage(snail_image, mapped.x - 16, mapped.y - 25);
     // ctx_transparent.fillStyle = `#272`;
     // isometric_pixel(snail[integer].x, y_boundary, snail[integer].z, 2);
     ctx_opaque.fillStyle = `#100600`;
