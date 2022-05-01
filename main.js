@@ -60,6 +60,9 @@ global_gravity = 0.000001;
 x_boundary = 30;
 y_boundary = 20;
 z_boundary = 20;
+x_movement_boundary = 29.5;
+y_movement_boundary = 19;
+z_movement_boundary = 19.5;
 fish_starvation_cap = 100000;
 snail_starvation_cap = 100000;
 const isometric_map = (x, y, z) => {
@@ -163,6 +166,7 @@ const draw_foods = () => {
     }
 }
 fish = [];
+fish_food_requirement = 20;
 fish_movement_cap = 0.5;
 const new_fish = (x, y, z) => {
     movement_x = (Math.random() * 2 - 1) * 0.01;
@@ -198,12 +202,12 @@ const age_fish = (fish_moved, integer) => {
     fish_moved.y += fish_moved.movement.y;
     fish_moved.z += fish_moved.movement.z;
     ctx_opaque.fillStyle = `#44f`;
-    if(fish_moved.x > x_boundary) {fish_moved.x = x_boundary; fish_moved.movement.x /= 2};
-    if(fish_moved.x < -x_boundary) {fish_moved.x = -x_boundary; fish_moved.movement.x /= 2};
-    if(fish_moved.y > y_boundary) {fish_moved.y = y_boundary; fish_moved.movement.y /= 2};
-    if(fish_moved.y < -y_boundary + y_boundary * 0.01) {fish_moved.y = -y_boundary; fish_moved.movement.y /= 2};
-    if(fish_moved.z > z_boundary) {fish_moved.z = z_boundary; fish_moved.movement.z /= 2};
-    if(fish_moved.z < -z_boundary) {fish_moved.z = -z_boundary; fish_moved.movement.z /= 2};
+    if(fish_moved.x > x_movement_boundary) {fish_moved.x = x_movement_boundary; fish_moved.movement.x /= 2};
+    if(fish_moved.x < -x_movement_boundary) {fish_moved.x = -x_movement_boundary; fish_moved.movement.x /= 2};
+    if(fish_moved.y > y_movement_boundary) {fish_moved.y = y_movement_boundary; fish_moved.movement.y /= 2};
+    if(fish_moved.y < -y_movement_boundary) {fish_moved.y = -y_movement_boundary; fish_moved.movement.y /= 2};
+    if(fish_moved.z > z_movement_boundary) {fish_moved.z = z_movement_boundary; fish_moved.movement.z /= 2};
+    if(fish_moved.z < -z_movement_boundary) {fish_moved.z = -z_movement_boundary; fish_moved.movement.z /= 2};
     if(fish_moved.movement.x > fish_movement_cap) fish_moved.movement.x = fish_movement_cap;
     if(fish_moved.movement.x < -fish_movement_cap) fish_moved.movement.x = -fish_movement_cap;
     if(fish_moved.movement.y > fish_movement_cap) fish_moved.movement.y = fish_movement_cap;
@@ -224,7 +228,7 @@ const age_fish = (fish_moved, integer) => {
         fish_moved.food++;
         fish.starvation = 0;
     }
-    if(fed && fish_moved.food >= 3) {
+    if(fed && fish_moved.food >= fish_food_requirement) {
         fish_moved.food = 0;
         new_fish(fish_moved.x, fish_moved.y, fish_moved.z);
     }
@@ -284,12 +288,13 @@ const draw_fish = (integer) => {
             }
         }
     }
-    ctx_transparent.drawImage(fish_image, mapped.x - 16, mapped.y);
+    ctx_transparent.drawImage(fish_image, mapped.x - 16, mapped.y - 16);
 }
 const draw_fishes = () => {
     for(i = 0; i < fish.length; i++) draw_fish(i);
 }
 snail = [];
+snail_food_requirement = 10;
 snail_movement_cap = 0.01;
 const new_snail = (x, z) => {
     movement_x = (Math.random() * 2 - 1) * 0.001;
@@ -322,10 +327,10 @@ const age_snail = (snail_moved, integer) => {
     snail_moved.x += snail_moved.movement.x;
     snail_moved.z += snail_moved.movement.z;
     ctx_opaque.fillStyle = `#44f`;
-    if(snail_moved.x > x_boundary) {snail_moved.x = x_boundary; snail_moved.movement.x /= 2};
-    if(snail_moved.x < -x_boundary) {snail_moved.x = -x_boundary; snail_moved.movement.x /= 2};
-    if(snail_moved.z > z_boundary) {snail_moved.z = z_boundary; snail_moved.movement.z /= 2};
-    if(snail_moved.z < -z_boundary) {snail_moved.z = -z_boundary; snail_moved.movement.z /= 2};
+    if(snail_moved.x > x_movement_boundary) {snail_moved.x = x_movement_boundary; snail_moved.movement.x /= 2};
+    if(snail_moved.x < -x_movement_boundary) {snail_moved.x = -x_movement_boundary; snail_moved.movement.x /= 2};
+    if(snail_moved.z > z_movement_boundary) {snail_moved.z = z_movement_boundary; snail_moved.movement.z /= 2};
+    if(snail_moved.z < -z_movement_boundary) {snail_moved.z = -z_movement_boundary; snail_moved.movement.z /= 2};
     if(snail_moved.movement.x > snail_movement_cap) snail_moved.movement.x = snail_movement_cap;
     if(snail_moved.movement.x < -snail_movement_cap) snail_moved.movement.x = -snail_movement_cap;
     if(snail_moved.movement.z > snail_movement_cap) snail_moved.movement.z = snail_movement_cap;
@@ -344,7 +349,7 @@ const age_snail = (snail_moved, integer) => {
         snail_moved.food++;
         snail.starvation = 0;
     }
-    if(fed && snail_moved.food >= 3) {
+    if(fed && snail_moved.food >= snail_food_requirement) {
         snail_moved.food = 0;
         new_snail(snail_moved.x, snail_moved.z);
     }
@@ -556,6 +561,7 @@ const sub_time = () => {
     // } else {
     //     new_food(mapped_cursor.x, mapped_cursor.z);
     // }
+    // draw_axis(fish[0].x, fish[0].y, fish[0].z);
     age_foods();
     age_fishes();
     age_snails();
@@ -564,7 +570,6 @@ const sub_time = () => {
         global_tick = 0;
         draw_ground(`32`);
     }
-    
     draw_foods();
     draw_shells();
     draw_snails();
@@ -572,9 +577,12 @@ const sub_time = () => {
     draw_water();
     draw_global_wireframe_front();
 }
+time_speed = 1;
 const time = () => {
     window.requestAnimationFrame(time);
-    sub_time();
+    // for(zips = 0; zips < time_speed; zips++) {
+        sub_time();
+    // }
 }
 cursor_x = 0;
 cursor_y = 0;
@@ -609,5 +617,7 @@ random_fish(16);
 random_snail(4);
 time();
 draw_global_wireframe_back();
+
+// simulate some degree of fluid motion and allow the cursor to move stuff around in the tank
 
 // use a similar gameplay loop to insane aquarium deluxe
