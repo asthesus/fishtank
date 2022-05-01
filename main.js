@@ -159,6 +159,8 @@ const draw_foods = () => {
         mapped = isometric_map(food[i].x, food[i].y, food[i].z);
         ctx_transparent.fillRect(mapped.x, mapped.y, 1, 1);
     }
+}
+const draw_static_foods = () => {
     for(i = 0; i < static_food.length; i++) {
         ctx_transparent.fillStyle = `#660`;
         mapped = isometric_map(static_food[i].x, y_boundary, static_food[i].z);
@@ -321,8 +323,8 @@ const age_snail = (snail_moved, integer) => {
     snail_moved.move_cycle++;
     if(snail_moved.move_cycle >= 400) {
         snail_moved.move_cycle = Math.floor(Math.random() * -100);
-        snail_moved.movement.x += (Math.random() * 2 - 1) * 0.0005;
-        snail_moved.movement.z += (Math.random() * 2 - 1) * 0.0005;
+        snail_moved.movement.x += (Math.random() * 2 - 1) * 0.001;
+        snail_moved.movement.z += (Math.random() * 2 - 1) * 0.001;
     }
     snail_moved.x += snail_moved.movement.x;
     snail_moved.z += snail_moved.movement.z;
@@ -570,9 +572,10 @@ const sub_time = () => {
         global_tick = 0;
         draw_ground(`32`);
     }
-    draw_foods();
+    draw_static_foods();
     draw_shells();
     draw_snails();
+    draw_foods();
     draw_fishes();
     draw_water();
     draw_global_wireframe_front();
