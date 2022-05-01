@@ -132,9 +132,9 @@ const new_food = (x, z) => {
     food.push(new_food_object);
 }
 const age_food = (food_moved, integer) => {
-    food_moved.movement.x += (Math.random() * 2 - 1) * 0.0001;
-    food_moved.movement.y += (Math.random() * 2 - 1) * 0.0001 + global_gravity;
-    food_moved.movement.z += (Math.random() * 2 - 1) * 0.0001;
+    food_moved.movement.x += (Math.random() * 2 - 1) * 0.00005;
+    food_moved.movement.y += (Math.random() * 2 - 1) * 0.00005 + global_gravity;
+    food_moved.movement.z += (Math.random() * 2 - 1) * 0.00005;
     food_moved.x += food_moved.movement.x;
     food_moved.y += food_moved.movement.y;
     food_moved.z += food_moved.movement.z;
@@ -166,8 +166,8 @@ const draw_foods = () => {
     }
 }
 fish = [];
-fish_food_requirement = 20;
-fish_movement_cap = 0.5;
+fish_food_requirement = 10;
+fish_movement_cap = 0.03;
 const new_fish = (x, y, z) => {
     movement_x = (Math.random() * 2 - 1) * 0.01;
     movement_y = (Math.random() * 2 - 1) * 0.001;
@@ -192,11 +192,11 @@ const age_fish = (fish_moved, integer) => {
         fish_moved.flip_cycle = Math.floor(Math.random() * 75);
         fish_moved.flip = !fish_moved.flip;
     }
-    if(fish_moved.move_cycle >= 100) {
+    if(fish_moved.move_cycle >= 200) {
         fish_moved.move_cycle = Math.floor(Math.random() * -50);
-        fish_moved.movement.x += (Math.random() * 2 - 1) * 0.001;
-        fish_moved.movement.y += (Math.random() * 2 - 1) * 0.0001;
-        fish_moved.movement.z += (Math.random() * 2 - 1) * 0.001;
+        fish_moved.movement.x += (Math.random() * 2 - 1) * 0.001 * (food.length * 0.05 + 1);
+        fish_moved.movement.y += (Math.random() * 2 - 1) * 0.0001 * (food.length * 0.05 + 1);
+        fish_moved.movement.z += (Math.random() * 2 - 1) * 0.001 * (food.length * 0.05 + 1);
     }
     fish_moved.x += fish_moved.movement.x;
     fish_moved.y += fish_moved.movement.y;
@@ -319,8 +319,8 @@ const kill_snail = (integer) => {
 const age_snail = (snail_moved, integer) => {
     snail_moved.starvation++;
     snail_moved.move_cycle++;
-    if(snail_moved.move_cycle >= 100) {
-        snail_moved.move_cycle = Math.floor(Math.random() * -50);
+    if(snail_moved.move_cycle >= 400) {
+        snail_moved.move_cycle = Math.floor(Math.random() * -100);
         snail_moved.movement.x += (Math.random() * 2 - 1) * 0.0005;
         snail_moved.movement.z += (Math.random() * 2 - 1) * 0.0005;
     }
@@ -617,6 +617,8 @@ random_fish(16);
 random_snail(4);
 time();
 draw_global_wireframe_back();
+
+// allow player to pick up shells from dead snails for points
 
 // simulate some degree of fluid motion and allow the cursor to move stuff around in the tank
 
