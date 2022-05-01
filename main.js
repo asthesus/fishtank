@@ -364,7 +364,7 @@ const draw_global_wireframe_back = () => {
     b_mapped = isometric_map(x_boundary, y_boundary, -z_boundary);
     c_mapped = isometric_map(-x_boundary, y_boundary, -z_boundary);
     d_mapped = isometric_map(-x_boundary, y_boundary, z_boundary);
-    ctx_opaque.strokeStyle = `#555`;
+    ctx_opaque.strokeStyle = `#50505050`;
     ctx_opaque.beginPath();
     ctx_opaque.moveTo(a_mapped.x, a_mapped.y);
     ctx_opaque.lineTo(b_mapped.x, b_mapped.y);
@@ -374,6 +374,7 @@ const draw_global_wireframe_back = () => {
     ctx_opaque.stroke();
     // columns
     e_mapped = isometric_map(x_boundary, -y_boundary, z_boundary);
+    f_mapped = isometric_map(x_boundary, -y_boundary, -z_boundary);
     g_mapped = isometric_map(-x_boundary, -y_boundary, -z_boundary);
     h_mapped = isometric_map(-x_boundary, -y_boundary, z_boundary);
     ctx_opaque.beginPath();
@@ -388,6 +389,12 @@ const draw_global_wireframe_back = () => {
     ctx_opaque.moveTo(d_mapped.x, d_mapped.y);
     ctx_opaque.lineTo(h_mapped.x, h_mapped.y);
     ctx_opaque.stroke();
+    // top
+    ctx_opaque.beginPath();
+    ctx_opaque.lineTo(e_mapped.x, e_mapped.y);
+    ctx_opaque.lineTo(h_mapped.x, h_mapped.y);
+    ctx_opaque.lineTo(g_mapped.x, g_mapped.y);
+    ctx_opaque.stroke();
 }
 const draw_global_wireframe_front = () => {
     // columns
@@ -396,16 +403,15 @@ const draw_global_wireframe_front = () => {
     f_mapped = isometric_map(x_boundary, -y_boundary, -z_boundary);
     g_mapped = isometric_map(-x_boundary, -y_boundary, -z_boundary);
     h_mapped = isometric_map(-x_boundary, -y_boundary, z_boundary);
-    ctx_transparent.strokeStyle = `#555`;
+    ctx_transparent.strokeStyle = `#50505050`;
     ctx_transparent.beginPath();
     ctx_transparent.moveTo(b_mapped.x, b_mapped.y);
     ctx_transparent.lineTo(f_mapped.x, f_mapped.y);
     ctx_transparent.stroke();
     // top
     ctx_transparent.lineTo(e_mapped.x, e_mapped.y);
-    ctx_transparent.lineTo(h_mapped.x, h_mapped.y);
-    ctx_transparent.lineTo(g_mapped.x, g_mapped.y);
     ctx_transparent.lineTo(f_mapped.x, f_mapped.y);
+    ctx_transparent.lineTo(g_mapped.x, g_mapped.y);
     ctx_transparent.stroke();
 }
 forest_drawn = false;
