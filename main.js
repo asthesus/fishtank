@@ -10,6 +10,14 @@ const snail5_png = document.getElementById(`snail5_png`);
 const snail6_png = document.getElementById(`snail6_png`);
 const snail7_png = document.getElementById(`snail7_png`);
 const snail8_png = document.getElementById(`snail8_png`);
+const shell1_png = document.getElementById(`shell1_png`);
+const shell2_png = document.getElementById(`shell2_png`);
+const shell3_png = document.getElementById(`shell3_png`);
+const shell4_png = document.getElementById(`shell4_png`);
+const shell5_png = document.getElementById(`shell5_png`);
+const shell6_png = document.getElementById(`shell6_png`);
+const shell7_png = document.getElementById(`shell7_png`);
+const shell8_png = document.getElementById(`shell8_png`);
 ctx_opaque.translate(0.5, 0.5);
 ctx_opaque.lineWidth = 1;
 ctx_transparent.translate(0.5, 0.5);
@@ -20,7 +28,7 @@ canvas = {width: 0, height: 0, center: {x: 0, y: 0}};
 draw_background = () => {
     ctx_opaque.fillStyle = background;
     ctx_opaque.fillRect(0, 0, canvas_opaque.width, canvas_opaque.height);
-    draw_floor();
+    draw_ground(`ff`);
     draw_global_wireframe_back();
 }
 fit_canvas = () => {
@@ -34,6 +42,7 @@ fit_canvas = () => {
     canvas.center.y = canvas_opaque.height / 2;
     draw_background();
 }
+global_tick = 0;
 global_scale = 12;
 global_skew = 0.7;
 global_height = 1;
@@ -61,12 +70,12 @@ const isometric_pixel = (x, y, z, size) => {
     mapped = isometric_map(x, y, z);
     if(size > 1) {ctx_transparent.fillRect(mapped.x - (size / 2), mapped.y - (size / 2), size, size)} else ctx_transparent.fillRect(mapped.x, mapped.y, 1, 1);
 }
-const draw_floor = () => {
+const draw_ground = (alpha) => {
     a_mapped = isometric_map(x_boundary, y_boundary, z_boundary);
     b_mapped = isometric_map(x_boundary, y_boundary, -z_boundary);
     c_mapped = isometric_map(-x_boundary, y_boundary, -z_boundary);
     d_mapped = isometric_map(-x_boundary, y_boundary, z_boundary);
-    ctx_opaque.fillStyle = `#120801`;
+    ctx_opaque.fillStyle = `#120801${alpha}`;
     ctx_opaque.beginPath();
     ctx_opaque.moveTo(a_mapped.x, a_mapped.y);
     ctx_opaque.lineTo(b_mapped.x, b_mapped.y);
@@ -110,9 +119,9 @@ const new_food = (x, z) => {
     food.push(new_food_object);
 }
 const age_food = (food_moved, integer) => {
-    food_moved.movement.x += (Math.random() * 2 - 1) * 0.001;
-    food_moved.movement.y += (Math.random() * 2 - 1) * 0.0001 + global_gravity;
-    food_moved.movement.z += (Math.random() * 2 - 1) * 0.001;
+    food_moved.movement.x += (Math.random() * 2 - 1) * 0.0001;
+    food_moved.movement.y += (Math.random() * 2 - 1) * 0.0005 + global_gravity;
+    food_moved.movement.z += (Math.random() * 2 - 1) * 0.0001;
     food_moved.x += food_moved.movement.x;
     food_moved.y += food_moved.movement.y;
     food_moved.z += food_moved.movement.z;
@@ -126,6 +135,7 @@ const age_food = (food_moved, integer) => {
         food.splice(integer, 1);
         static_food.push(food_moved);
     }
+    if(food_moved.y < -y_boundary) {food_moved.y = -y_boundary; food_moved.movement.y /= 2};
 }
 const age_foods = () => {
     for(i = 0; i < food.length; i++) age_food(food[i], i);
@@ -230,6 +240,12 @@ const random_snail = (quantity) => {
         new_snail(x, z);
     }
 }
+shell = [];
+const kill_snail = (integer) => {
+    new_shell_object = {x: snail[integer].x, z: snail[integer].z, facing: snail[integer].movement};
+    shell.push(new_shell_object);
+    snail.splice(integer, 1);
+}
 const age_snail = (snail_moved, integer) => {
     snail_moved.starvation++;
     snail_moved.move_cycle++;
@@ -268,7 +284,7 @@ const age_snail = (snail_moved, integer) => {
         new_snail(snail_moved.x, snail_moved.z);
     }
     if(snail_moved.starvation >= snail_starvation_cap) {
-        if(snail_moved.food > 0) {snail_moved.food--} else snail.splice(integer, 1);
+        if(snail_moved.food > 0) {snail_moved.food--} else kill_snail(integer);
     }
 }
 const age_snails = () => {
@@ -285,9 +301,6 @@ const draw_snail = (integer) => {
                 // north east
                 snail_image = snail4_png;
             }
-            // east
-            // snail_image = snail4_png;
-            // snail_image = snail8_png;
         } else {
             if(snail[i].movement.x / snail[i].movement.z <= -1) {
                 // north
@@ -317,14 +330,56 @@ const draw_snail = (integer) => {
         }
     }
     ctx_transparent.drawImage(snail_image, mapped.x - 16, mapped.y - 25);
-    // ctx_transparent.fillStyle = `#272`;
-    // isometric_pixel(snail[integer].x, y_boundary, snail[integer].z, 2);
     ctx_opaque.fillStyle = `#100600`;
     mapped = isometric_map(snail[integer].x, y_boundary, snail[integer].z);
     ctx_opaque.fillRect(mapped.x - 1, mapped.y - 1, 2, 2);
 }
 const draw_snails = () => {
     for(i = 0; i < snail.length; i++) draw_snail(i);
+}
+const draw_shell = (integer) => {
+    mapped = isometric_map(shell[integer].x, y_boundary, shell[integer].z);
+    if(shell[i].facing.x <= 0) {
+        if(shell[i].facing.z <= 0) {
+            if(shell[i].facing.x / shell[i].facing.z <= 1) {
+                // east
+                shell_image = shell8_png;
+            } else {
+                // north east
+                shell_image = shell4_png;
+            }
+        } else {
+            if(shell[i].facing.x / shell[i].facing.z <= -1) {
+                // north
+                shell_image = shell7_png;
+            } else {
+                // north west
+                shell_image = shell3_png;
+            }
+        }
+    } else {
+        if(shell[i].facing.z <= 0) {
+            if(shell[i].facing.x / shell[i].facing.z <= -1) {
+                // south
+                shell_image = shell5_png;
+            } else {
+                // south east
+                shell_image = shell2_png;
+            }
+        } else {
+            if(shell[i].facing.x / shell[i].facing.z <= 1) {
+                // west
+                shell_image = shell6_png;
+            } else {
+                // south west
+                shell_image = shell1_png;
+            }
+        }
+    }
+    ctx_transparent.drawImage(shell_image, mapped.x - 16, mapped.y - 25);
+}
+const draw_shells = () => {
+    for(i = 0; i < shell.length; i++) draw_shell(i);
 }
 const draw_axis = (x, y, z) => {
     x_axis_start = isometric_map(-x_boundary, y, z);
@@ -439,8 +494,14 @@ const sub_time = () => {
     age_foods();
     age_fishes();
     age_snails();
+    global_tick++;
+    if(global_tick >= 10000) {
+        global_tick = 0;
+        draw_ground(`32`);
+    }
     draw_fishes();
     draw_foods();
+    draw_shells();
     draw_snails();
     draw_water();
     draw_global_wireframe_front();
