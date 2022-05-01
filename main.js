@@ -60,8 +60,8 @@ global_gravity = 0.000001;
 x_boundary = 30;
 y_boundary = 20;
 z_boundary = 20;
-fish_starvation_cap = 50000;
-snail_starvation_cap = 50000;
+fish_starvation_cap = 100000;
+snail_starvation_cap = 100000;
 const isometric_map = (x, y, z) => {
     mapped = {};
     mapped.x = (z * -global_scale) + (x * -global_scale);
@@ -169,6 +169,7 @@ const new_fish = (x, y, z) => {
     movement_y = (Math.random() * 2 - 1) * 0.001;
     movement_z = (Math.random() * 2 - 1) * 0.01;
     new_fish_object = {x: x, y: y, z: z, movement: {x: movement_x, y: movement_y, z: movement_z}, starvation: 0, food: 0, move_cycle: 0, flip_cycle: 0, flip: false};
+    new_fish_object.starvation += Math.random() * fish_starvation_cap * 0.5;
     fish.push(new_fish_object);
 }
 const random_fish = (quantity) => {
@@ -294,6 +295,7 @@ const new_snail = (x, z) => {
     movement_x = (Math.random() * 2 - 1) * 0.001;
     movement_z = (Math.random() * 2 - 1) * 0.001;
     new_snail_object = {x: x, z: z, movement: {x: movement_x, z: movement_z}, starvation: 0, food: 0, move_cycle: 0};
+    new_snail_object.starvation += Math.random() * snail_starvation_cap * 0.5;
     snail.push(new_snail_object);
 }
 const random_snail = (quantity) => {
