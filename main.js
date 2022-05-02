@@ -826,12 +826,12 @@ canvas_transparent.addEventListener(`mousemove`, e => {
     if(vertical !== left_click.vertical) {left_click.y = cursor_y; left_click.vertical = vertical};
     if(left_click.held) {
         if(global_height < 1) {
-            global_height = global_height + (left_click.y - cursor_y) * 0.0002;
-            global_skew = global_skew - (left_click.y - cursor_y) * 0.0002;
-        } else {
+            global_height = global_height + (left_click.y - cursor_y) * 0.0004;
             global_skew = global_skew - (left_click.y - cursor_y) * 0.0004;
+        } else {
+            global_skew = global_skew - (left_click.y - cursor_y) * 0.0008;
             if(global_skew > 1) {
-                global_height = global_height + (left_click.y - cursor_y) * 0.0004;
+                global_height = global_height + (left_click.y - cursor_y) * 0.0008;
             } else {
                 global_height = 1;
             }
