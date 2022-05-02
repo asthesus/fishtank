@@ -56,13 +56,13 @@ boundary_mapped = {};
 x_movement_boundary = 29.5;
 y_movement_boundary = 19;
 z_movement_boundary = 19.5;
-fish_starvation_cap = 10000000;
-snail_starvation_cap = 10000000;
+fish_starvation_cap = 1000000;
+snail_starvation_cap = 1000000;
 bubble = [];
 bubble_movement_cap = 0.025;
 food = [];
 static_food = [];
-food_cap = 500;
+food_cap = 2000;
 fish = [];
 fish_food_requirement = 10;
 fish_movement_cap = 0.03;
@@ -72,9 +72,12 @@ snail_food_requirement = 10;
 snail_movement_cap = 0.01;
 snail_cap = 500;
 shell = [];
-player_selection = {};
+cursor_selection = {};
 cursor_x = 0;
 cursor_y = 0;
+cursor_over_top = false;
+left_click = {x: 0, y: 0, held: false, vertical: 0};
+right_click = {x: 0, y: 0, held: false};
 background = `#0a0a0a`;
 foreground = `#aaa`;
 //
@@ -113,6 +116,11 @@ const isometric_map = (x, y, z) => {
     mapped.x += canvas.center.x;
     mapped.y += canvas.center.y;
     return mapped;
+}
+const reskew = (value) => {
+    global_skew = value;
+    find_boundary_coordinates();
+    draw_background();
 }
 const find_boundary_coordinates = () => {
     //     h
@@ -251,7 +259,8 @@ const new_fish = (x, y, z) => {
     let movement_y = (Math.random() * 2 - 1) * 0.001;
     let movement_z = (Math.random() * 2 - 1) * 0.01;
     let new_fish_object = {x: x, y: y, z: z, movement: {x: movement_x, y: movement_y, z: movement_z}, starvation: 0, food: 0, move_cycle: 0, flip_cycle: 0, flip: false};
-    new_fish_object.starvation += Math.random() * fish_starvation_cap * 0.5;
+    new_fish_object.move_cycle -= Math.floor(Math.random() * -50);
+    new_fish_object.starvation += Math.floor(Math.random() * fish_starvation_cap * 0.5);
     fish.push(new_fish_object);
 }
 const random_fish = (quantity) => {
@@ -271,10 +280,12 @@ const age_fish = (fish_moved, integer) => {
         fish_moved.flip = !fish_moved.flip;
     }
     if(fish_moved.move_cycle >= 200) {
-        fish_moved.move_cycle = Math.floor(Math.random() * -50) + Math.floor(food.length * 0.3);
-        fish_moved.movement.x += (Math.random() * 2 - 1) * 0.001 * (food.length * 0.3 + 1);
-        fish_moved.movement.y += (Math.random() * 2 - 1) * 0.0001 * (food.length * 0.3 + 1);
-        fish_moved.movement.z += (Math.random() * 2 - 1) * 0.001 * (food.length * 0.3 + 1);
+        let food_boost = food.length;
+        if(food_boost > 500) food_boost = 500;
+        fish_moved.move_cycle = Math.floor(Math.random() * -50) + Math.floor(food_boost * 0.3);
+        fish_moved.movement.x += (Math.random() * 2 - 1) * 0.001 * (food_boost * 0.3 + 1);
+        fish_moved.movement.y += (Math.random() * 2 - 1) * 0.0001 * (food_boost * 0.3 + 1);
+        fish_moved.movement.z += (Math.random() * 2 - 1) * 0.001 * (food_boost * 0.3 + 1);
     }
     fish_moved.x += fish_moved.movement.x;
     fish_moved.y += fish_moved.movement.y;
@@ -314,7 +325,7 @@ const age_fish = (fish_moved, integer) => {
     // }
     if(fed) {
         fish_moved.food++;
-        fish.starvation = 0;
+        fish_moved.starvation = 0;
     }
     if(fed && fish_moved.food >= fish_food_requirement && fish.length < fish_cap) {
         fish_moved.food = 0;
@@ -404,13 +415,37 @@ const draw_fish = (integer) => {
     ctx_transparent.drawImage(fish_image, mapped.x - 16, mapped.y - 16);
 }
 const draw_fishes = () => {
-    for(let i = 0; i < fish.length; i++) draw_fish(i);
+    let proximity_list = [];
+    let draw_list = [];
+    for(let i = 0; i < fish.length; i++) {
+        proximity_list[i] = Math.sqrt(Math.abs(fish[i].x - x_boundary) ** 2 + Math.abs(fish[i].z - -z_boundary) ** 2);
+    }
+    while(draw_list.length < fish.length) {
+        let closest = 0;
+        let closest_fish = 0;
+        for(let i = 0; i < proximity_list.length; i++) {
+            if(proximity_list[i] > closest) {
+                closest = proximity_list[i];
+                closest_fish = i;
+            }
+        }
+        draw_list.push(closest_fish);
+        proximity_list[closest_fish] = 0;
+    }
+    for(let i = 0; i < draw_list.length; i++) {
+        let integer = draw_list[i];
+        draw_fish(integer);
+    }
+    // do a 2d distance check for each fish for its distance from the closest edge of the tank to the screen, not factoring in height
+    // x_boundary, __, -z_boundary
+    // for(let i = 0; i < fish.length; i++) draw_fish(i);
 }
 const new_snail = (x, z) => {
     let movement_x = (Math.random() * 2 - 1) * 0.001;
     let movement_z = (Math.random() * 2 - 1) * 0.001;
     let new_snail_object = {x: x, y: y_boundary, z: z, movement: {x: movement_x, y: 0, z: movement_z}, starvation: 0, food: 0, move_cycle: 0};
-    new_snail_object.starvation += Math.random() * snail_starvation_cap * 0.5;
+    new_snail_object.move_cycle -= Math.floor(Math.random() * -50);
+    new_snail_object.starvation += Math.floor(Math.random() * snail_starvation_cap * 0.5);
     snail.push(new_snail_object);
 }
 const random_snail = (quantity) => {
@@ -521,7 +556,29 @@ const draw_snail = (integer) => {
     ctx_opaque.fillRect(mapped.x - 1, mapped.y - 1, 2, 2);
 }
 const draw_snails = () => {
-    for(let i = 0; i < snail.length; i++) draw_snail(i);
+    let proximity_list = [];
+    let draw_list = [];
+    for(let i = 0; i < snail.length; i++) {
+        let mapped = isometric_map(snail[i].x, snail[i].y, snail[i].z);
+        proximity_list[i] = mapped.y;
+    }
+    while(draw_list.length < snail.length) {
+        let highest = Infinity;
+        let highest_snail = 0;
+        for(let i = 0; i < proximity_list.length; i++) {
+            if(proximity_list[i] < highest) {
+                highest = proximity_list[i];
+                highest_snail = i;
+            }
+        }
+        draw_list.push(highest_snail);
+        proximity_list[highest_snail] = Infinity;
+    }
+    for(let i = 0; i < draw_list.length; i++) {
+        let integer = draw_list[i];
+        draw_snail(integer);
+    }
+    // for(let i = 0; i < snail.length; i++) draw_snail(i);
 }
 const draw_shell = (integer) => {
     let mapped = isometric_map(shell[integer].x, y_boundary, shell[integer].z);
@@ -674,12 +731,14 @@ const cursor_select = () => {
             selected_object = i;
         }
     }
-    if(shortest_distance < 16) {player_selection = selected_array[selected_object]} else player_selection = {};
+    if(shortest_distance < 16) {cursor_selection = selected_array[selected_object]} else cursor_selection = {};
 }
 const sub_time = () => {
     ctx_transparent.clearRect(0, 0, canvas.width, canvas.height);
     let mapped_cursor = flat_map(cursor_x, cursor_y + canvas.center.y / 2);
-    if(food.length < food_cap && !(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
+    cursor_over_top = false;
+    if(!left_click.held && food.length < food_cap && !(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
+        cursor_over_top = true;
         new_food(mapped_cursor.x, mapped_cursor.z);
         // new_bubble(mapped_cursor.x, y_boundary, mapped_cursor.z);
     }
@@ -698,9 +757,9 @@ const sub_time = () => {
     // } else {
     //     new_food(mapped_cursor.x, mapped_cursor.z);
     // }
-    if(player_selection.x !== undefined) {
-        draw_vector(player_selection.x, player_selection.y, player_selection.z, player_selection.movement.x, player_selection.movement.y, player_selection.movement.z);
-        draw_axis(player_selection.x, player_selection.y, player_selection.z);
+    if(cursor_selection.x !== undefined) {
+        draw_vector(cursor_selection.x, cursor_selection.y, cursor_selection.z, cursor_selection.movement.x, cursor_selection.movement.y, cursor_selection.movement.z);
+        draw_axis(cursor_selection.x, cursor_selection.y, cursor_selection.z);
     }
     for(let zips = 0; zips < global_time_speed; zips++) {
         age_foods();
@@ -728,6 +787,9 @@ canvas_transparent.addEventListener(`mousedown`, e => {
     cursor_x = e.clientX - canvas.center.x;
     cursor_y = e.clientY - canvas.center.y;
     if(e.button === 0) {
+        left_click.held = true;
+        left_click.x = cursor_x;
+        left_click.y = cursor_y;
         // fish.x = flat_map(cursor_x, cursor_y + canvas.center.y / 2).x;
         // fish.y = -y_boundary;
         // fish.z = flat_map(cursor_x, cursor_y + canvas.center.y / 2).z;
@@ -737,18 +799,41 @@ canvas_transparent.addEventListener(`mousedown`, e => {
         // }
         cursor_select();
     } else if(e.button === 2) {
+        right_click.held = true;
+        right_click.x = cursor_x;
+        right_click.y = cursor_y;
     }
 })
 canvas_transparent.addEventListener(`mouseup`, e => {
     cursor_x = e.clientX - canvas.center.x;
     cursor_y = e.clientY - canvas.center.y;
     if(e.button === 0) {
+        left_click.held = false;
     } else if(e.button === 2) {
+        right_click.held = false;
     }
 })
 canvas_transparent.addEventListener(`mousemove`, e => {
+    let saved_x = cursor_x;
+    let saved_y = cursor_y;
     cursor_x = e.clientX - canvas.center.x;
     cursor_y = e.clientY - canvas.center.y;
+    vertical = Math.sign(saved_y - cursor_y);
+    if(vertical !== left_click.vertical) {left_click.y = cursor_y; left_click.vertical = vertical};
+    if(left_click.held) {
+        global_skew = global_skew - (left_click.y - cursor_y) * 0.0004;
+        if(global_skew < 0) global_skew = 0;
+        if(global_skew > 1) {
+            global_skew = 1;
+            // global_height = global_height - (left_click.y - cursor_y) * 0.00005;
+            // if(global_height < 0) global_height = 0;
+            // if(global_height > 1) global_height = 1;
+        }
+        // else {
+        //     global_height = 1;
+        // }
+        reskew(global_skew);
+    }
 })
 window.addEventListener(`resize`, fit_canvas, false);
 fit_canvas();
