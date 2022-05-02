@@ -65,12 +65,12 @@ static_food = [];
 food_cap = 500;
 fish = [];
 fish_food_requirement = 10;
-fish_movement_cap = 0.025;
-fish_cap = 200;
+fish_movement_cap = 0.03;
+fish_cap = 2000;
 snail = [];
 snail_food_requirement = 10;
 snail_movement_cap = 0.01;
-snail_cap = 500;
+snail_cap = 5000;
 shell = [];
 player_selection = {};
 cursor_x = 0;
@@ -271,10 +271,10 @@ const age_fish = (fish_moved, integer) => {
         fish_moved.flip = !fish_moved.flip;
     }
     if(fish_moved.move_cycle >= 200) {
-        fish_moved.move_cycle = Math.floor(Math.random() * -50);
-        fish_moved.movement.x += (Math.random() * 2 - 1) * 0.001 * (food.length * 0.05 + 1);
-        fish_moved.movement.y += (Math.random() * 2 - 1) * 0.0001 * (food.length * 0.05 + 1);
-        fish_moved.movement.z += (Math.random() * 2 - 1) * 0.001 * (food.length * 0.05 + 1);
+        fish_moved.move_cycle = Math.floor(Math.random() * -50) + Math.floor(food.length * 0.3);
+        fish_moved.movement.x += (Math.random() * 2 - 1) * 0.001 * (food.length * 0.3 + 1);
+        fish_moved.movement.y += (Math.random() * 2 - 1) * 0.0001 * (food.length * 0.3 + 1);
+        fish_moved.movement.z += (Math.random() * 2 - 1) * 0.001 * (food.length * 0.3 + 1);
     }
     fish_moved.x += fish_moved.movement.x;
     fish_moved.y += fish_moved.movement.y;
@@ -295,11 +295,13 @@ const age_fish = (fish_moved, integer) => {
     // eat
     let fed = false;
     for(let ii = 0; ii < food.length; ii++) {
-        distance_from_food = Math.sqrt((Math.abs(fish_moved.x - food[ii].x) ** 2) + (Math.abs(fish_moved.y - food[ii].y) ** 2) + (Math.abs(fish_moved.z - food[ii].z) ** 2));
-        if(distance_from_food <= 1) {
-            food.splice(ii, 1);
-            fed = true;
-            ii--;
+        if(Math.abs(fish_moved.x - food[ii].x) <= 1 && Math.abs(fish_moved.y - food[ii].y) <= 1 && Math.abs(fish_moved.z - food[ii].z) <= 1) {
+            distance_from_food = Math.sqrt((Math.abs(fish_moved.x - food[ii].x) ** 2) + (Math.abs(fish_moved.y - food[ii].y) ** 2) + (Math.abs(fish_moved.z - food[ii].z) ** 2));
+            if(distance_from_food <= 1) {
+                food.splice(ii, 1);
+                fed = true;
+                ii--;
+            }
         }
     }
     // for(let ii = 0; ii < static_food.length; ii++) {
@@ -447,12 +449,14 @@ const age_snail = (snail_moved, integer) => {
     // eat
     let fed = false;
     for(let ii = 0; ii < static_food.length; ii++) {
-        distance_from_food = Math.sqrt((Math.abs(snail_moved.x - static_food[ii].x) ** 2) + (Math.abs(snail_moved.z - static_food[ii].z) ** 2));
-        if(distance_from_food <= 0.5) {
-            static_food.splice(ii, 1);
-            ii--;
-            fed = true;
-            draw_static_transparent();
+        if(Math.abs(snail_moved.x - static_food[ii].x) <= 0.5 && Math.abs(snail_moved.z - static_food[ii].z) <= 0.5) {
+            distance_from_food = Math.sqrt((Math.abs(snail_moved.x - static_food[ii].x) ** 2) + (Math.abs(snail_moved.z - static_food[ii].z) ** 2));
+            if(distance_from_food <= 0.5) {
+                static_food.splice(ii, 1);
+                ii--;
+                fed = true;
+                draw_static_transparent();
+            }
         }
     }
     if(fed) {
