@@ -231,7 +231,9 @@ const age_food = (food_moved, integer) => {
     if(food_moved.z < -z_boundary) {food_moved.z = -z_boundary; food_moved.movement.z /= 2};
     if(food_moved.y > y_boundary) {
         food_moved.y = y_boundary;
-        food_moved.movement.y = 0;
+        delete food_moved.movement;
+        food_moved.x = Math.ceil(food_moved.x * 8) / 8;
+        food_moved.z = Math.floor(food_moved.z * 8) / 8;
         food.splice(integer, 1);
         static_food.push(food_moved);
         draw_static_food(static_food.length - 1);
@@ -456,6 +458,8 @@ const random_snail = (quantity) => {
     }
 }
 const kill_snail = (integer) => {
+    snail[integer].movement.x = Math.ceil(snail[integer].movement.x * 8) / 8;
+    snail[integer].movement.z = Math.floor(snail[integer].movement.z * 8) / 8;
     let new_shell_object = {x: snail[integer].x, y: y_boundary, z: snail[integer].z, facing: snail[integer].movement};
     bubble_burst(snail[integer].x, y_boundary, snail[integer].z, Math.floor(Math.random() * 3) + 2);
     shell.push(new_shell_object);
@@ -821,17 +825,21 @@ canvas_transparent.addEventListener(`mousemove`, e => {
     vertical = Math.sign(saved_y - cursor_y);
     if(vertical !== left_click.vertical) {left_click.y = cursor_y; left_click.vertical = vertical};
     if(left_click.held) {
-        global_skew = global_skew - (left_click.y - cursor_y) * 0.0004;
-        if(global_skew < 0) global_skew = 0;
-        if(global_skew > 1) {
-            global_skew = 1;
-            // global_height = global_height - (left_click.y - cursor_y) * 0.00005;
-            // if(global_height < 0) global_height = 0;
-            // if(global_height > 1) global_height = 1;
+        if(global_height < 1) {
+            global_height = global_height + (left_click.y - cursor_y) * 0.0002;
+            global_skew = global_skew - (left_click.y - cursor_y) * 0.0002;
+        } else {
+            global_skew = global_skew - (left_click.y - cursor_y) * 0.0004;
+            if(global_skew > 1) {
+                global_height = global_height + (left_click.y - cursor_y) * 0.0004;
+            } else {
+                global_height = 1;
+            }
         }
-        // else {
-        //     global_height = 1;
-        // }
+        if(global_skew < 0) global_skew = 0;
+        if(global_skew > 2) global_skew = 2;
+        if(global_height < 0) global_height = 0;
+        if(global_height > 1) global_height = 1;
         reskew(global_skew);
     }
 })
