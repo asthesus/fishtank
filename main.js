@@ -68,7 +68,7 @@ fish_food_requirement = 10;
 fish_movement_cap = 0.03;
 fish_cap = 500;
 snail = [];
-snail_food_requirement = 10;
+snail_food_requirement = 30;
 snail_movement_cap = 0.01;
 snail_cap = 500;
 shell = [];
@@ -142,9 +142,10 @@ const find_boundary_coordinates = () => {
     boundary_mapped.h = isometric_map(-x_boundary, -y_boundary, z_boundary);
 }
 const flat_map = (x, y) => {
+    // x120 y-360 mapped stays centered on cursor when max height
     let mapped = {};
-    mapped.x = (y / global_scale / global_skew) + (x / -global_scale / 2);
-    mapped.z = (x / -global_scale / 2) - (y / global_scale / global_skew);
+    mapped.x = 0.5 * (  y / global_scale - x / global_scale);
+    mapped.z = 0.5 * (- y / global_scale - x / global_scale);
     return mapped;
 }
 const isometric_pixel = (x, y, z, size) => {
@@ -739,9 +740,9 @@ const cursor_select = () => {
 }
 const sub_time = () => {
     ctx_transparent.clearRect(0, 0, canvas.width, canvas.height);
-    let mapped_cursor = flat_map(cursor_x, cursor_y + canvas.center.y / 2);
+    let mapped_cursor = flat_map(cursor_x, cursor_y);
     cursor_over_top = false;
-    if(!left_click.held && food.length < food_cap && !(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
+    if(global_height === 0 && !left_click.held && food.length < food_cap && !(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
         cursor_over_top = true;
         new_food(mapped_cursor.x, mapped_cursor.z);
         // new_bubble(mapped_cursor.x, y_boundary, mapped_cursor.z);
