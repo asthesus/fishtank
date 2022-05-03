@@ -157,7 +157,6 @@ const isometric_pixel = (x, y, z, size) => {
 }
 const draw_ground = (alpha) => {
     ctx_opaque.fillStyle = `#362403${alpha}`;
-    // ctx_opaque.fillStyle = `#120801${alpha}`;
     ctx_opaque.beginPath();
     ctx_opaque.moveTo(boundary_map.a.x, boundary_map.a.y);
     ctx_opaque.lineTo(boundary_map.b.x, boundary_map.b.y);
@@ -320,14 +319,6 @@ const age_fish = (fish_moved, integer) => {
             }
         }
     }
-    // for(let ii = 0; ii < static_food.length; ii++) {
-    //     distance_from_food = Math.sqrt((Math.abs(fish_moved.x - static_food[ii].x) ** 2) + (Math.abs(fish_moved.y - static_food[ii].y) ** 2) + (Math.abs(fish_moved.z - static_food[ii].z) ** 2));
-    //     if(distance_from_food <= 1) {
-    //         static_food.splice(ii, 1);
-    //         fed = true;
-    //         ii--;
-    //     }
-    // }
     if(fed) {
         fish_moved.food++;
         fish_moved.starvation = 0;
@@ -344,8 +335,6 @@ const age_fishes = () => {
     for(let i = 0; i < fish.length; i++) age_fish(fish[i], i);
 }
 const draw_fish = (integer) => {
-    // ctx_transparent.fillStyle = `#36f`;
-    // isometric_pixel(fish[integer].x, fish[integer].y, fish[integer].z, 2);
     let mapped = isometric_to_screen(fish[integer].x, fish[integer].y, fish[integer].z);
     let fish_image;
     if(fish[integer].movement.x <= 0) {
@@ -558,7 +547,6 @@ const draw_snail = (integer) => {
     }
     ctx_transparent.drawImage(snail_image, mapped.x - 16, mapped.y - 25);
     ctx_opaque.fillStyle = `#262402`;
-    // ctx_opaque.fillStyle = `#100600`;
     mapped = isometric_to_screen(snail[integer].x, y_boundary, snail[integer].z);
     ctx_opaque.fillRect(mapped.x - 1, mapped.y - 1, 2, 2);
 }
@@ -585,7 +573,6 @@ const draw_snails = () => {
         let integer = draw_list[i];
         draw_snail(integer);
     }
-    // for(let i = 0; i < snail.length; i++) draw_snail(i);
 }
 const draw_shell = (integer) => {
     let mapped = isometric_to_screen(shell[integer].x, y_boundary, shell[integer].z);
@@ -700,7 +687,7 @@ const draw_global_wireframe_back = () => {
     ctx_opaque.stroke();
 }
 const draw_global_wireframe_front = () => {
-    // columns
+    // column
     ctx_transparent.strokeStyle = `#50505050`;
     ctx_transparent.beginPath();
     ctx_transparent.moveTo(boundary_map.b.x, boundary_map.b.y);
@@ -747,23 +734,7 @@ const sub_time = () => {
     if(!left_click.held && food.length < food_cap && !(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
         cursor_over_top = true;
         new_food(mapped_cursor.x, mapped_cursor.z);
-        // new_bubble(mapped_cursor.x, y_boundary, mapped_cursor.z);
     }
-    // if(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary) {
-    //     if(mapped_cursor.x < -x_boundary) mapped_cursor.x = -x_boundary;
-    //     if(mapped_cursor.x > x_boundary) mapped_cursor.x = x_boundary;
-    //     if(mapped_cursor.z < -z_boundary) mapped_cursor.z = -z_boundary;
-    //     if(mapped_cursor.z > z_boundary) mapped_cursor.z = z_boundary;
-    //     mapped_cursor = isometric_to_screen(mapped_cursor.x, -y_boundary, mapped_cursor.z);
-    //     ctx_transparent.strokeStyle = `#5af`;
-    //     ctx_transparent.beginPath();
-    //     // ctx_transparent.moveTo(mapped_food.x, mapped_food.y);
-    //     ctx_transparent.moveTo(mapped_cursor.x, mapped_cursor.y);
-    //     ctx_transparent.lineTo(canvas.center.x + cursor_x, canvas.center.y + cursor_y);
-    //     ctx_transparent.stroke();
-    // } else {
-    //     new_food(mapped_cursor.x, mapped_cursor.z);
-    // }
     if(cursor_selection.x !== undefined) {
         draw_vector(cursor_selection.x, cursor_selection.y, cursor_selection.z, cursor_selection.movement.x, cursor_selection.movement.y, cursor_selection.movement.z);
         draw_axis(cursor_selection.x, cursor_selection.y, cursor_selection.z);
@@ -796,13 +767,6 @@ canvas_transparent.addEventListener(`mousedown`, e => {
         left_click.held = true;
         left_click.x = cursor_x;
         left_click.y = cursor_y;
-        // fish.x = screen_to_isometric(cursor_x, cursor_y + canvas.center.y / 2).x;
-        // fish.y = -y_boundary;
-        // fish.z = screen_to_isometric(cursor_x, cursor_y + canvas.center.y / 2).z;
-        // mapped_cursor = screen_to_isometric(cursor_x, cursor_y + canvas.center.y / 2);
-        // if(!(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
-        //     new_food(mapped_cursor.x, mapped_cursor.z);
-        // }
         cursor_select();
     } else if(e.button === 2) {
         right_click.held = true;
