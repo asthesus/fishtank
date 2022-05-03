@@ -41,8 +41,6 @@ ctx_opaque.lineWidth = 1;
 ctx_transparent.translate(0.5, 0.5);
 ctx_transparent.lineWidth = 1;
 // global variables
-spawned_food_y = 0;
-//
 global_tick = 0;
 global_scale = 12;
 global_skew = 0.7;
@@ -144,26 +142,12 @@ const find_boundary_coordinates = () => {
     boundary_mapped.h = isometric_map(-x_boundary, -y_boundary, z_boundary);
 }
 const flat_map = (x, y) => {
-    // distance_from_food = y - spawned_food_y + canvas.center.y;
-    
-    let top = isometric_map(0, -y_boundary, 0);
-    let distance_from_top = y - top.y + canvas.center.y;
-
-    // console.log(distance_from_food / distance_from_top);
-
-    y += y_boundary * global_scale * global_height;
-    y += distance_from_top * global_height;
-    if(global_height === 1) {
-        y *= (1 / global_skew);
-    } else {
-        if(global_height !== 0) y *= 8 / 9;
-        // now, just to fix when global_height is below 1...
-    }
+    y = (y + y_boundary * global_scale * global_height) * 2 / global_skew;
     x /= global_scale;
     y /= global_scale;
     let mapped = {};
-    mapped.x = 0.5 * (  y - x);
-    mapped.z = 0.5 * (- y - x);
+    mapped.x = 0.5 * (y - x);
+    mapped.z = 0.5 * (-y - x);
     return mapped;
 }
 const isometric_pixel = (x, y, z, size) => {
@@ -763,8 +747,6 @@ const sub_time = () => {
     if(!left_click.held && food.length < food_cap && !(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
         cursor_over_top = true;
         new_food(mapped_cursor.x, mapped_cursor.z);
-
-        spawned_food_y = isometric_map(mapped_cursor.x, -y_boundary, mapped_cursor.z).y;
         // new_bubble(mapped_cursor.x, y_boundary, mapped_cursor.z);
     }
     // if(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary) {
@@ -838,7 +820,7 @@ canvas_transparent.addEventListener(`mouseup`, e => {
     }
 })
 canvas_transparent.addEventListener(`mousemove`, e => {
-    let saved_x = cursor_x;
+    // let saved_x = cursor_x;
     let saved_y = cursor_y;
     cursor_x = e.clientX - canvas.center.x;
     cursor_y = e.clientY - canvas.center.y;
@@ -877,7 +859,3 @@ draw_global_wireframe_back();
 // simulate some degree of fluid motion and allow the cursor to move stuff around in the tank
 
 // use a similar gameplay loop to insane aquarium deluxe
-
-
-// global_height = 0.5;
-// reskew(1.5);
