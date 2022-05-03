@@ -768,7 +768,7 @@ const sub_time = () => {
     draw_fishes();
     draw_bubbles();
     if(global_skew < 0) {
-        ctx_transparent.fillStyle = `#271801`;
+        ctx_transparent.fillStyle = `#291900`;
         ctx_transparent.beginPath();
         ctx_transparent.moveTo(boundary_map.a.x, boundary_map.a.y);
         ctx_transparent.lineTo(boundary_map.b.x, boundary_map.b.y);
