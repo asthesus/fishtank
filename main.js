@@ -43,7 +43,7 @@ ctx_transparent.lineWidth = 1;
 // global variables
 global_tick = 0;
 global_scale = 12;
-global_skew = 0.7;
+global_skew = 1;
 global_height = 1;
 global_gravity = 0.000001;
 global_midnight = 10000;
@@ -73,8 +73,8 @@ snail_movement_cap = 0.01;
 snail_cap = 500;
 shell = [];
 cursor_selection = {};
-cursor_x = 0;
-cursor_y = 0;
+cursor_x = Infinity;
+cursor_y = Infinity;
 cursor_over_top = false;
 left_click = {x: 0, y: 0, held: false, vertical: 0};
 right_click = {x: 0, y: 0, held: false};
@@ -142,10 +142,25 @@ const find_boundary_coordinates = () => {
     boundary_mapped.h = isometric_map(-x_boundary, -y_boundary, z_boundary);
 }
 const flat_map = (x, y) => {
-    // x120 y-360 mapped stays centered on cursor when max height
+    // when tilted, food gets (1 - skew) percent of the way to cursor
+    let top = isometric_map(0, -y_boundary, 0);
+    let distance_from_top = y - top.y + canvas.center.y;
+    
+    y += y_boundary * global_scale * global_height;
+    y += distance_from_top * global_height;
+
+    if(global_skew !== 1 && global_height === 1) {
+        // distance_from_top = y - top.y;
+        y += distance_from_top / global_skew;
+    }
+    
+
+    x /= global_scale;
+    y /= global_scale;
+
     let mapped = {};
-    mapped.x = 0.5 * (  y / global_scale - x / global_scale);
-    mapped.z = 0.5 * (- y / global_scale - x / global_scale);
+    mapped.x = 0.5 * (  y - x);
+    mapped.z = 0.5 * (- y - x);
     return mapped;
 }
 const isometric_pixel = (x, y, z, size) => {
@@ -742,7 +757,7 @@ const sub_time = () => {
     ctx_transparent.clearRect(0, 0, canvas.width, canvas.height);
     let mapped_cursor = flat_map(cursor_x, cursor_y);
     cursor_over_top = false;
-    if(global_height === 0 && !left_click.held && food.length < food_cap && !(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
+    if(!left_click.held && food.length < food_cap && !(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
         cursor_over_top = true;
         new_food(mapped_cursor.x, mapped_cursor.z);
         // new_bubble(mapped_cursor.x, y_boundary, mapped_cursor.z);
@@ -783,6 +798,10 @@ const sub_time = () => {
     draw_bubbles();
     // draw_water();
     draw_global_wireframe_front();
+
+    ctx_transparent.fillStyle = `#f00`;
+    let top = isometric_map(0, -y_boundary, 0);
+    ctx_transparent.fillRect(top.x - 1, top.y - 1, 2, 2);
 }
 const time = () => {
     window.requestAnimationFrame(time);
