@@ -57,8 +57,8 @@ boundary_map = {};
 x_movement_boundary = 29.5;
 y_movement_boundary = 19;
 z_movement_boundary = 19.5;
-fish_starvation_cap = 1000000;
-snail_starvation_cap = 1000000;
+fish_starvation_cap = 2000000;
+snail_starvation_cap = 2000000;
 bubble = [];
 bubble_movement_cap = 0.025;
 food = [];
@@ -258,23 +258,6 @@ const draw_static_food = (integer) => {
     ctx_static_transparent.fillRect(mapped.x, mapped.y, 1, 1);
 }
 const draw_static_foods = () => {for(let i = 0; i < static_food.length; i++) draw_static_food(i)};
-const new_fish = (x, y, z) => {
-    let movement_x = (Math.random() * 2 - 1) * 0.01;
-    let movement_y = (Math.random() * 2 - 1) * 0.001;
-    let movement_z = (Math.random() * 2 - 1) * 0.01;
-    let new_fish_object = {x: x, y: y, z: z, movement: {x: movement_x, y: movement_y, z: movement_z}, starvation: 0, food: 0, move_cycle: 0, flip_cycle: 0, flip: false};
-    new_fish_object.move_cycle -= Math.floor(Math.random() * -50);
-    new_fish_object.starvation += Math.floor(Math.random() * fish_starvation_cap * 0.5);
-    fish.push(new_fish_object);
-}
-const random_fish = (quantity) => {
-    for(let i = 0; i < quantity; i++) {
-        let x = Math.random() * x_boundary * 2 - x_boundary;
-        let y = Math.random() * y_boundary * 2 - y_boundary;
-        let z = Math.random() * z_boundary * 2 - z_boundary;
-        new_fish(x, y, z);
-    }
-}
 const age_fish = (fish_moved, integer) => {
     fish_moved.starvation++;
     fish_moved.flip_cycle++;
@@ -325,7 +308,7 @@ const age_fish = (fish_moved, integer) => {
     }
     if(fed && fish_moved.food >= fish_food_requirement && fish.length < fish_cap) {
         fish_moved.food = 0;
-        new_fish(fish_moved.x, fish_moved.y, fish_moved.z);
+        new_creature(fish, 1, false, fish_moved.x, fish_moved.y, fish_moved.z);
     }
     if(fish_moved.starvation >= fish_starvation_cap) {
         if(fish_moved.food > 0) {fish_moved.food--} else fish.splice(integer, 1);
@@ -434,19 +417,36 @@ const draw_fishes = () => {
     // x_boundary, __, -z_boundary
     // for(let i = 0; i < fish.length; i++) draw_fish(i);
 }
-const new_snail = (x, z) => {
-    let movement_x = (Math.random() * 2 - 1) * 0.001;
-    let movement_z = (Math.random() * 2 - 1) * 0.001;
-    let new_snail_object = {x: x, y: y_boundary, z: z, movement: {x: movement_x, y: 0, z: movement_z}, starvation: 0, food: 0, move_cycle: 0};
-    new_snail_object.move_cycle -= Math.floor(Math.random() * -50);
-    new_snail_object.starvation += Math.floor(Math.random() * snail_starvation_cap * 0.5);
-    snail.push(new_snail_object);
-}
-const random_snail = (quantity) => {
+random_isometric = (boundary) => {return Math.random() * boundary * 2 - boundary};
+const new_creature = (array, quantity, random, x, y, z) => {
     for(let i = 0; i < quantity; i++) {
-        let x = Math.random() * x_boundary * 2 - x_boundary;
-        let z = Math.random() * z_boundary * 2 - z_boundary;
-        new_snail(x, z);
+        if(array === fish) {
+            let movement_x = (Math.random() * 2 - 1) * 0.01;
+            let movement_y = (Math.random() * 2 - 1) * 0.001;
+            let movement_z = (Math.random() * 2 - 1) * 0.01;
+            let new_creature_object = {x: x, y: y, z: z, movement: {x: movement_x, y: movement_y, z: movement_z}, starvation: 0, food: 0, move_cycle: 0, flip_cycle: 0, flip: false};
+            if(random) {
+                new_creature_object.x = random_isometric(x_boundary);
+                new_creature_object.y = random_isometric(y_boundary);
+                new_creature_object.z = random_isometric(z_boundary);
+            }
+            new_creature_object.move_cycle -= Math.floor(Math.random() * -50);
+            new_creature_object.starvation += Math.floor(Math.random() * fish_starvation_cap * 0.5);
+            fish.push(new_creature_object);
+        }
+        if(array === snail) {
+            let movement_x = (Math.random() * 2 - 1) * 0.001;
+            let movement_z = (Math.random() * 2 - 1) * 0.001;
+            let new_creature_object = {x: x, y: y, z: z, movement: {x: movement_x, y: 0, z: movement_z}, starvation: 0, food: 0, move_cycle: 0};
+            if(random) {
+                new_creature_object.x = random_isometric(x_boundary);
+                new_creature_object.y = y_boundary;
+                new_creature_object.z = random_isometric(z_boundary);
+            }
+            new_creature_object.move_cycle -= Math.floor(Math.random() * -50);
+            new_creature_object.starvation += Math.floor(Math.random() * snail_starvation_cap * 0.5);
+            snail.push(new_creature_object);
+        }
     }
 }
 const kill_snail = (integer) => {
@@ -496,7 +496,7 @@ const age_snail = (snail_moved, integer) => {
     }
     if(fed && snail_moved.food >= snail_food_requirement && snail.length < snail_cap) {
         snail_moved.food = 0;
-        new_snail(snail_moved.x, snail_moved.z);
+        new_creature(snail, 1, false, snail_moved.x, y_boundary, snail_moved.z);
     }
     if(snail_moved.starvation >= snail_starvation_cap) {
         if(snail_moved.food > 0) {snail_moved.food--} else kill_snail(integer);
@@ -658,6 +658,15 @@ const draw_axis = (x, y, z) => {
     // ctx_transparent.stroke();
 }
 const draw_global_wireframe_back = () => {
+    //     h
+    //     .
+    // g.     .e
+    //     .f
+    //     
+    //     .d
+    // c.     .a
+    //     .
+    //     b
     ctx_opaque.strokeStyle = `#50505050`;
     ctx_opaque.beginPath();
     ctx_opaque.moveTo(boundary_map.a.x, boundary_map.a.y);
@@ -725,7 +734,7 @@ const cursor_select = () => {
             selected_object = i;
         }
     }
-    if(shortest_distance < 16) {cursor_selection = selected_array[selected_object]} else cursor_selection = {};
+    if(shortest_distance < 16) {cursor_selection = selected_array[selected_object]};
 }
 const sub_time = () => {
     ctx_transparent.clearRect(0, 0, canvas.width, canvas.height);
@@ -809,10 +818,18 @@ canvas_transparent.addEventListener(`mousemove`, e => {
         reskew(global_skew);
     }
 })
+const keyDown = (e) => {
+    if(e.key === `Escape`) {
+        global_height = 1;
+        reskew(0.7);
+        cursor_selection = {};
+    }
+}
+document.addEventListener(`keydown`, keyDown);
 window.addEventListener(`resize`, fit_canvas, false);
 fit_canvas();
-random_fish(16);
-random_snail(4);
+new_creature(fish, 16, true);
+new_creature(snail, 4, true);
 time();
 draw_global_wireframe_back();
 
