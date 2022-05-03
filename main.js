@@ -156,7 +156,7 @@ const flat_map = (x, y) => {
     if(global_height === 1) {
         y *= (1 / global_skew);
     } else {
-        y *= 8 / 9;
+        if(global_height !== 0) y *= 8 / 9;
         // now, just to fix when global_height is below 1...
     }
     x /= global_scale;
@@ -801,12 +801,7 @@ const sub_time = () => {
     draw_foods();
     draw_fishes();
     draw_bubbles();
-    // draw_water();
     draw_global_wireframe_front();
-
-    ctx_transparent.fillStyle = `#f00`;
-    let top = isometric_map(0, -y_boundary, 0);
-    ctx_transparent.fillRect(top.x - 1, top.y - 1, 2, 2);
 }
 const time = () => {
     window.requestAnimationFrame(time);
@@ -884,5 +879,5 @@ draw_global_wireframe_back();
 // use a similar gameplay loop to insane aquarium deluxe
 
 
-global_height = 0.5;
-reskew(1.5);
+// global_height = 0.5;
+// reskew(1.5);
