@@ -149,11 +149,14 @@ const flat_map = (x, y) => {
     y += y_boundary * global_scale * global_height;
     y += distance_from_top * global_height;
 
+    // crappy bandaid
     if(global_skew !== 1 && global_height === 1) {
-        // distance_from_top = y - top.y;
-        y += distance_from_top / global_skew;
+        if(global_skew < 0.5) {
+            y += distance_from_top / global_skew;
+        } else {
+            y += distance_from_top * (1 - global_skew);
+        }
     }
-    
 
     x /= global_scale;
     y /= global_scale;
