@@ -87,7 +87,7 @@ const draw_background = () => {
     ctx_opaque.fillStyle = background;
     ctx_opaque.fillRect(0, 0, canvas_opaque.width, canvas_opaque.height);
     draw_water();
-    draw_ground(`ff`);
+    if(global_skew > 0) draw_ground(`ff`);
     draw_global_wireframe_back();
     draw_static_transparent();
 }
@@ -172,7 +172,11 @@ const draw_water = () => {
     ctx_opaque.lineTo(boundary_map.d.x, boundary_map.d.y);
     ctx_opaque.lineTo(boundary_map.c.x, boundary_map.c.y);
     ctx_opaque.lineTo(boundary_map.g.x, boundary_map.g.y);
-    ctx_opaque.lineTo(boundary_map.h.x, boundary_map.h.y);
+    if(global_skew > 0) {
+        ctx_opaque.lineTo(boundary_map.h.x, boundary_map.h.y);
+    } else {
+        ctx_opaque.lineTo(boundary_map.f.x, boundary_map.f.y);
+    }
     ctx_opaque.lineTo(boundary_map.e.x, boundary_map.e.y);
     ctx_opaque.lineTo(boundary_map.a.x, boundary_map.a.y);
     ctx_opaque.fill();
@@ -740,7 +744,7 @@ const sub_time = () => {
     ctx_transparent.clearRect(0, 0, canvas.width, canvas.height);
     let mapped_cursor = screen_to_isometric(cursor_x, cursor_y);
     cursor_over_top = false;
-    if(!left_click.held && food.length < food_cap && !(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
+    if(global_skew > 0 && !left_click.held && food.length < food_cap && !(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
         cursor_over_top = true;
         new_food(mapped_cursor.x, mapped_cursor.z);
     }
@@ -763,6 +767,16 @@ const sub_time = () => {
     draw_foods();
     draw_fishes();
     draw_bubbles();
+    if(global_skew < 0) {
+        ctx_transparent.fillStyle = `#271801`;
+        ctx_transparent.beginPath();
+        ctx_transparent.moveTo(boundary_map.a.x, boundary_map.a.y);
+        ctx_transparent.lineTo(boundary_map.b.x, boundary_map.b.y);
+        ctx_transparent.lineTo(boundary_map.c.x, boundary_map.c.y);
+        ctx_transparent.lineTo(boundary_map.d.x, boundary_map.d.y);
+        ctx_transparent.lineTo(boundary_map.a.x, boundary_map.a.y);
+        ctx_transparent.fill();
+    }
     draw_global_wireframe_front();
 }
 const time = () => {
@@ -801,17 +815,24 @@ canvas_transparent.addEventListener(`mousemove`, e => {
     if(vertical !== left_click.vertical) {left_click.y = cursor_y; left_click.vertical = vertical};
     if(left_click.held) {
         if(global_height < 1) {
-            global_height = global_height + (left_click.y - cursor_y) * 0.0004;
+            if(global_skew > 0) {
+                global_height = global_height + (left_click.y - cursor_y) * 0.0004;
+            } else {
+                global_height = global_height - (left_click.y - cursor_y) * 0.0004;
+            }
+            
             global_skew = global_skew - (left_click.y - cursor_y) * 0.0004;
         } else {
             global_skew = global_skew - (left_click.y - cursor_y) * 0.0008;
             if(global_skew > 1) {
                 global_height = global_height + (left_click.y - cursor_y) * 0.0008;
+            } else if(global_skew < -1) {
+                global_height = global_height - (left_click.y - cursor_y) * 0.0008;
             } else {
                 global_height = 1;
             }
         }
-        if(global_skew < 0) global_skew = 0;
+        if(global_skew < -2) global_skew = -2;
         if(global_skew > 2) global_skew = 2;
         if(global_height < 0) global_height = 0;
         if(global_height > 1) global_height = 1;
