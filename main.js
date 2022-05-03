@@ -41,9 +41,11 @@ ctx_opaque.lineWidth = 1;
 ctx_transparent.translate(0.5, 0.5);
 ctx_transparent.lineWidth = 1;
 // global variables
+spawned_food_y = 0;
+//
 global_tick = 0;
 global_scale = 12;
-global_skew = 1;
+global_skew = 0.7;
 global_height = 1;
 global_gravity = 0.000001;
 global_midnight = 10000;
@@ -109,6 +111,11 @@ const fit_canvas = () => {
     find_boundary_coordinates();
     draw_background();
 }
+const reskew = (value) => {
+    global_skew = value;
+    find_boundary_coordinates();
+    draw_background();
+}
 const isometric_map = (x, y, z) => {
     let mapped = {};
     mapped.x = (z * -global_scale) + (x * -global_scale);
@@ -116,11 +123,6 @@ const isometric_map = (x, y, z) => {
     mapped.x += canvas.center.x;
     mapped.y += canvas.center.y;
     return mapped;
-}
-const reskew = (value) => {
-    global_skew = value;
-    find_boundary_coordinates();
-    draw_background();
 }
 const find_boundary_coordinates = () => {
     //     h
@@ -142,25 +144,14 @@ const find_boundary_coordinates = () => {
     boundary_mapped.h = isometric_map(-x_boundary, -y_boundary, z_boundary);
 }
 const flat_map = (x, y) => {
-    // when tilted, food gets (1 - skew) percent of the way to cursor
+    // now, just to fix when global_height is below 1...
     let top = isometric_map(0, -y_boundary, 0);
     let distance_from_top = y - top.y + canvas.center.y;
-    
     y += y_boundary * global_scale * global_height;
     y += distance_from_top * global_height;
-
-    // crappy bandaid
-    if(global_skew !== 1 && global_height === 1) {
-        if(global_skew < 0.5) {
-            y += distance_from_top / global_skew;
-        } else {
-            y += distance_from_top * (1 - global_skew);
-        }
-    }
-
+    y *= (1 / global_skew);
     x /= global_scale;
     y /= global_scale;
-
     let mapped = {};
     mapped.x = 0.5 * (  y - x);
     mapped.z = 0.5 * (- y - x);
@@ -763,6 +754,8 @@ const sub_time = () => {
     if(!left_click.held && food.length < food_cap && !(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
         cursor_over_top = true;
         new_food(mapped_cursor.x, mapped_cursor.z);
+
+        spawned_food_y = isometric_map(mapped_cursor.x, -y_boundary, mapped_cursor.z).y;
         // new_bubble(mapped_cursor.x, y_boundary, mapped_cursor.z);
     }
     // if(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary) {
