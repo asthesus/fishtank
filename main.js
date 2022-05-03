@@ -4,14 +4,14 @@ const canvas_transparent = document.getElementById(`canvas3`);
 const ctx_opaque = canvas_opaque.getContext(`2d`);
 const ctx_static_transparent = canvas_static_transparent.getContext(`2d`);
 const ctx_transparent = canvas_transparent.getContext(`2d`);
-const snail1_png = document.getElementById(`snail1_png`);
-const snail2_png = document.getElementById(`snail2_png`);
-const snail3_png = document.getElementById(`snail3_png`);
-const snail4_png = document.getElementById(`snail4_png`);
-const snail5_png = document.getElementById(`snail5_png`);
-const snail6_png = document.getElementById(`snail6_png`);
-const snail7_png = document.getElementById(`snail7_png`);
-const snail8_png = document.getElementById(`snail8_png`);
+let snail_sw_png = document.getElementById(`snail1_png`);
+let snail_se_png = document.getElementById(`snail2_png`);
+let snail_nw_png = document.getElementById(`snail3_png`);
+let snail_ne_png = document.getElementById(`snail4_png`);
+let snail_s_png = document.getElementById(`snail5_png`);
+let snail_w_png = document.getElementById(`snail6_png`);
+let snail_n_png = document.getElementById(`snail7_png`);
+let snail_e_png = document.getElementById(`snail8_png`);
 const shell1_png = document.getElementById(`shell1_png`);
 const shell2_png = document.getElementById(`shell2_png`);
 const shell3_png = document.getElementById(`shell3_png`);
@@ -20,67 +20,66 @@ const shell5_png = document.getElementById(`shell5_png`);
 const shell6_png = document.getElementById(`shell6_png`);
 const shell7_png = document.getElementById(`shell7_png`);
 const shell8_png = document.getElementById(`shell8_png`);
-const fish1_png = document.getElementById(`fish1_png`);
-const fish2_png = document.getElementById(`fish2_png`);
-const fish3_png = document.getElementById(`fish3_png`);
-const fish4_png = document.getElementById(`fish4_png`);
-const fish5_png = document.getElementById(`fish5_png`);
-const fish6_png = document.getElementById(`fish6_png`);
-const fish7_png = document.getElementById(`fish7_png`);
-const fish8_png = document.getElementById(`fish8_png`);
-const fish1flip_png = document.getElementById(`fish1flip_png`);
-const fish2flip_png = document.getElementById(`fish2flip_png`);
-const fish3flip_png = document.getElementById(`fish3flip_png`);
-const fish4flip_png = document.getElementById(`fish4flip_png`);
-const fish5flip_png = document.getElementById(`fish5flip_png`);
-const fish6flip_png = document.getElementById(`fish6flip_png`);
-const fish7flip_png = document.getElementById(`fish7flip_png`);
-const fish8flip_png = document.getElementById(`fish8flip_png`);
+let fish_sw_png = document.getElementById(`fish1_png`);
+let fish_se_png = document.getElementById(`fish2_png`);
+let fish_nw_png = document.getElementById(`fish3_png`);
+let fish_ne_png = document.getElementById(`fish4_png`);
+let fish_w_png = document.getElementById(`fish5_png`);
+let fish_e_png = document.getElementById(`fish6_png`);
+let fish_s_png = document.getElementById(`fish7_png`);
+let fish_n_png = document.getElementById(`fish8_png`);
+let fish_sw_flip_png = document.getElementById(`fish1flip_png`);
+let fish_se_flip_png = document.getElementById(`fish2flip_png`);
+let fish_nw_flip_png = document.getElementById(`fish3flip_png`);
+let fish_ne_flip_png = document.getElementById(`fish4flip_png`);
+let fish_w_flip_png = document.getElementById(`fish5flip_png`);
+let fish_e_flip_png = document.getElementById(`fish6flip_png`);
+let fish_s_flip_png = document.getElementById(`fish7flip_png`);
+let fish_n_flip_png = document.getElementById(`fish8flip_png`);
 //
 ctx_opaque.translate(0.5, 0.5);
 ctx_opaque.lineWidth = 1;
 ctx_transparent.translate(0.5, 0.5);
 ctx_transparent.lineWidth = 1;
 // global variables
-global_tick = 0;
-global_scale = 12;
-global_skew = 0.7;
-global_height = 1;
-global_gravity = 0.000001;
-global_midnight = 10000;
-global_time_speed = 1;
-global_midnight = 10000;
-x_boundary = 30;
-y_boundary = 20;
-z_boundary = 20;
-boundary_map = {};
-x_movement_boundary = 29.5;
-y_movement_boundary = 19;
-z_movement_boundary = 19.5;
-fish_starvation_cap = 2000000;
-snail_starvation_cap = 2000000;
-bubble = [];
-bubble_movement_cap = 0.025;
-food = [];
-static_food = [];
-food_cap = 2000;
-fish = [];
-fish_food_requirement = 10;
-fish_movement_cap = 0.03;
-fish_cap = 500;
-snail = [];
-snail_food_requirement = 30;
-snail_movement_cap = 0.01;
-snail_cap = 500;
-shell = [];
-cursor_selection = {};
-cursor_x = Infinity;
-cursor_y = Infinity;
-cursor_over_top = false;
-left_click = {x: 0, y: 0, held: false, vertical: 0};
-right_click = {x: 0, y: 0, held: false};
-background = `#0a0a0a`;
-foreground = `#aaa`;
+let global_tick = 0;
+let global_scale = 12;
+let global_skew = 0.7;
+let global_height = 1;
+let global_gravity = 0.000001;
+let global_midnight = 10000;
+let global_time_speed = 1;
+let x_boundary = 30;
+let y_boundary = 20;
+let z_boundary = 20;
+const boundary_map = {};
+let x_movement_boundary = 29.5;
+let y_movement_boundary = 19;
+let z_movement_boundary = 19.5;
+let fish_starvation_cap = 2000000;
+let snail_starvation_cap = 2000000;
+const bubble = [];
+let bubble_movement_cap = 0.025;
+const food = [];
+const static_food = [];
+let food_cap = 2000;
+const fish = [];
+let fish_food_requirement = 10;
+let fish_movement_cap = 0.03;
+let fish_cap = 500;
+const snail = [];
+let snail_food_requirement = 30;
+let snail_movement_cap = 0.01;
+let snail_cap = 500;
+const shell = [];
+let cursor_selection = {};
+let cursor_x = Infinity;
+let cursor_y = Infinity;
+let cursor_over_top = false;
+const left_click = {x: 0, y: 0, held: false, vertical: 0};
+const right_click = {x: 0, y: 0, held: false};
+let background = `#0a0a0a`;
+let foreground = `#aaa`;
 //
 const canvas = {width: 0, height: 0, center: {x: 0, y: 0}};
 const draw_background = () => {
@@ -112,6 +111,33 @@ const fit_canvas = () => {
 }
 const reskew = (value) => {
     global_skew = value;
+    if(global_skew > 0) {
+        fish_sw_png = document.getElementById(`fish1_png`);
+        fish_se_png = document.getElementById(`fish2_png`);
+        fish_nw_png = document.getElementById(`fish3_png`);
+        fish_ne_png = document.getElementById(`fish4_png`);
+        fish_sw_flip_png = document.getElementById(`fish1flip_png`);
+        fish_se_flip_png = document.getElementById(`fish2flip_png`);
+        fish_nw_flip_png = document.getElementById(`fish3flip_png`);
+        fish_ne_flip_png = document.getElementById(`fish4flip_png`);
+        fish_s_png = document.getElementById(`fish7_png`);
+        fish_n_png = document.getElementById(`fish8_png`);
+        fish_s_flip_png = document.getElementById(`fish7flip_png`);
+        fish_n_flip_png = document.getElementById(`fish8flip_png`);
+    } else {
+        fish_nw_png = document.getElementById(`fish1_png`);
+        fish_ne_png = document.getElementById(`fish2_png`);
+        fish_sw_png = document.getElementById(`fish3_png`);
+        fish_se_png = document.getElementById(`fish4_png`);
+        fish_nw_flip_png = document.getElementById(`fish1flip_png`);
+        fish_ne_flip_png = document.getElementById(`fish2flip_png`);
+        fish_sw_flip_png = document.getElementById(`fish3flip_png`);
+        fish_se_flip_png = document.getElementById(`fish4flip_png`);
+        fish_n_png = document.getElementById(`fish7_png`);
+        fish_s_png = document.getElementById(`fish8_png`);
+        fish_n_flip_png = document.getElementById(`fish7flip_png`);
+        fish_s_flip_png = document.getElementById(`fish8flip_png`);
+    }
     find_boundary_coordinates();
     draw_background();
 }
@@ -329,33 +355,59 @@ const draw_fish = (integer) => {
             if(fish[integer].movement.x / fish[integer].movement.z <= 1) {
                 // east
                 if(fish[integer].flip) {
-                    fish_image = fish6flip_png;
+                    fish_image = fish_e_flip_png;
                 } else {
-                    fish_image = fish6_png;
+                    fish_image = fish_e_png;
                 }
             } else {
                 // north east
                 if(fish[integer].flip) {
-                    fish_image = fish4flip_png;
+                    fish_image = fish_ne_flip_png;
                 } else {
-                    fish_image = fish4_png;
+                    fish_image = fish_ne_png;
                 }
+                // if(global_skew >= 0) {
+                //     if(fish[integer].flip) {
+                //         fish_image = fish_ne_flip_png;
+                //     } else {
+                //         fish_image = fish_ne_png;
+                //     }
+                // } else {
+                //     if(fish[integer].flip) {
+                //         fish_image = fish_se_flip_png;
+                //     } else {
+                //         fish_image = fish_se_png;
+                //     }
+                // }
             }
         } else {
             if(fish[integer].movement.x / fish[integer].movement.z <= -1) {
                 // north
                 if(fish[integer].flip) {
-                    fish_image = fish8flip_png;
+                    fish_image = fish_n_flip_png;
                 } else {
-                    fish_image = fish8_png;
+                    fish_image = fish_n_png;
                 }
             } else {
                 // north west
                 if(fish[integer].flip) {
-                    fish_image = fish3flip_png;
+                    fish_image = fish_nw_flip_png;
                 } else {
-                    fish_image = fish3_png;
+                    fish_image = fish_nw_png;
                 }
+                // if(global_skew >= 0) {
+                //     if(fish[integer].flip) {
+                //         fish_image = fish_nw_flip_png;
+                //     } else {
+                //         fish_image = fish_nw_png;
+                //     }
+                // } else {
+                //     if(fish[integer].flip) {
+                //         fish_image = fish_sw_flip_png;
+                //     } else {
+                //         fish_image = fish_sw_png;
+                //     }
+                // }
             }
         }
     } else {
@@ -363,33 +415,59 @@ const draw_fish = (integer) => {
             if(fish[integer].movement.x / fish[integer].movement.z <= -1) {
                 // south
                 if(fish[integer].flip) {
-                    fish_image = fish7flip_png;
+                    fish_image = fish_s_flip_png;
                 } else {
-                    fish_image = fish7_png;
+                    fish_image = fish_s_png;
                 }
             } else {
                 // south east
                 if(fish[integer].flip) {
-                    fish_image = fish2flip_png;
+                    fish_image = fish_se_flip_png;
                 } else {
-                    fish_image = fish2_png;
+                    fish_image = fish_se_png;
                 }
+                // if(global_skew >= 0) {
+                //     if(fish[integer].flip) {
+                //         fish_image = fish_se_flip_png;
+                //     } else {
+                //         fish_image = fish_se_png;
+                //     }
+                // } else {
+                //     if(fish[integer].flip) {
+                //         fish_image = fish_ne_flip_png;
+                //     } else {
+                //         fish_image = fish_ne_png;
+                //     }
+                // }
             }
         } else {
             if(fish[integer].movement.x / fish[integer].movement.z <= 1) {
                 // west
                 if(fish[integer].flip) {
-                    fish_image = fish5flip_png;
+                    fish_image = fish_w_flip_png;
                 } else {
-                    fish_image = fish5_png;
+                    fish_image = fish_w_png;
                 }
             } else {
                 // south west
                 if(fish[integer].flip) {
-                    fish_image = fish1flip_png;
+                    fish_image = fish_sw_flip_png;
                 } else {
-                    fish_image = fish1_png;
+                    fish_image = fish_sw_png;
                 }
+                // if(global_skew >= 0) {
+                //     if(fish[integer].flip) {
+                //         fish_image = fish_sw_flip_png;
+                //     } else {
+                //         fish_image = fish_sw_png;
+                //     }
+                // } else {
+                //     if(fish[integer].flip) {
+                //         fish_image = fish_nw_flip_png;
+                //     } else {
+                //         fish_image = fish_nw_png;
+                //     }
+                // }
             }
         }
     }
@@ -516,36 +594,36 @@ const draw_snail = (integer) => {
         if(snail[integer].movement.z <= 0) {
             if(snail[integer].movement.x / snail[integer].movement.z <= 1) {
                 // east
-                snail_image = snail8_png;
+                snail_image = snail_e_png;
             } else {
                 // north east
-                snail_image = snail4_png;
+                snail_image = snail_ne_png;
             }
         } else {
             if(snail[integer].movement.x / snail[integer].movement.z <= -1) {
                 // north
-                snail_image = snail7_png;
+                snail_image = snail_n_png;
             } else {
                 // north west
-                snail_image = snail3_png;
+                snail_image = snail_ne_png;
             }
         }
     } else {
         if(snail[integer].movement.z <= 0) {
             if(snail[integer].movement.x / snail[integer].movement.z <= -1) {
                 // south
-                snail_image = snail5_png;
+                snail_image = snail_s_png;
             } else {
                 // south east
-                snail_image = snail2_png;
+                snail_image = snail_se_png;
             }
         } else {
             if(snail[integer].movement.x / snail[integer].movement.z <= 1) {
                 // west
-                snail_image = snail6_png;
+                snail_image = snail_w_png;
             } else {
                 // south west
-                snail_image = snail1_png;
+                snail_image = snail_sw_png;
             }
         }
     }
@@ -820,7 +898,6 @@ canvas_transparent.addEventListener(`mousemove`, e => {
             } else {
                 global_height = global_height - (left_click.y - cursor_y) * 0.0004;
             }
-            
             global_skew = global_skew - (left_click.y - cursor_y) * 0.0004;
         } else {
             global_skew = global_skew - (left_click.y - cursor_y) * 0.0008;
