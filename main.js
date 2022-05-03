@@ -144,12 +144,21 @@ const find_boundary_coordinates = () => {
     boundary_mapped.h = isometric_map(-x_boundary, -y_boundary, z_boundary);
 }
 const flat_map = (x, y) => {
-    // now, just to fix when global_height is below 1...
+    // distance_from_food = y - spawned_food_y + canvas.center.y;
+    
     let top = isometric_map(0, -y_boundary, 0);
     let distance_from_top = y - top.y + canvas.center.y;
+
+    // console.log(distance_from_food / distance_from_top);
+
     y += y_boundary * global_scale * global_height;
     y += distance_from_top * global_height;
-    y *= (1 / global_skew);
+    if(global_height === 1) {
+        y *= (1 / global_skew);
+    } else {
+        y *= 8 / 9;
+        // now, just to fix when global_height is below 1...
+    }
     x /= global_scale;
     y /= global_scale;
     let mapped = {};
@@ -873,3 +882,7 @@ draw_global_wireframe_back();
 // simulate some degree of fluid motion and allow the cursor to move stuff around in the tank
 
 // use a similar gameplay loop to insane aquarium deluxe
+
+
+global_height = 0.5;
+reskew(1.5);
