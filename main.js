@@ -258,19 +258,19 @@ const age_tentacle_monster = (monster_moved, integer) => {
         monster_moved.movement.z += (Math.random() * 2 - 1) * 0.1;
         for(let i = 0; i < 7; i++) {
             monster_moved.tentacle[i].movement.x += (Math.random() * 2 - 1) * 0.05;
-            monster_moved.tentacle[i].movement.y += (Math.random() * 2 - 1) * 0.005;
+            monster_moved.tentacle[i].movement.y += (Math.random() * 2 - 1) * 0.05;
             monster_moved.tentacle[i].movement.z += (Math.random() * 2 - 1) * 0.05;
         }
     }
     monster_moved.x += monster_moved.movement.x;
     monster_moved.y += monster_moved.movement.y;
     monster_moved.z += monster_moved.movement.z;
-    if(monster_moved.x + monster_moved.radius / global_scale > x_boundary) {monster_moved.x = x_boundary - monster_moved.radius / global_scale; monster_moved.movement.x /= 2};
-    if(monster_moved.x - monster_moved.radius / global_scale < -x_boundary) {monster_moved.x = -x_boundary + monster_moved.radius / global_scale; monster_moved.movement.x /= 2};
-    if(monster_moved.y > y_boundary) {monster_moved.y = y_boundary; monster_moved.movement.y /= 2};
-    if(monster_moved.y - monster_moved.radius / global_scale * 2 < -y_boundary) {monster_moved.y = -y_boundary + monster_moved.radius / global_scale * 2; monster_moved.movement.y /= 2};
-    if(monster_moved.z + monster_moved.radius / global_scale > z_boundary) {monster_moved.z = z_boundary - monster_moved.radius / global_scale; monster_moved.movement.z /= 2};
-    if(monster_moved.z - monster_moved.radius / global_scale < -z_boundary) {monster_moved.z = -z_boundary + monster_moved.radius / global_scale; monster_moved.movement.z /= 2};
+    if(monster_moved.x + monster_moved.radius / global_scale > x_boundary) {monster_moved.x = x_boundary - monster_moved.radius / global_scale; monster_moved.movement.x *= 0.5};
+    if(monster_moved.x - monster_moved.radius / global_scale < -x_boundary) {monster_moved.x = -x_boundary + monster_moved.radius / global_scale; monster_moved.movement.x *= 0.5};
+    if(monster_moved.y + monster_moved.radius / global_scale * 2 > y_boundary) {monster_moved.y = y_boundary - monster_moved.radius / global_scale * 2; monster_moved.movement.y *= 0.5};
+    if(monster_moved.y - monster_moved.radius / global_scale * 2 < -y_boundary) {monster_moved.y = -y_boundary + monster_moved.radius / global_scale * 2; monster_moved.movement.y *= 0.5};
+    if(monster_moved.z + monster_moved.radius / global_scale > z_boundary) {monster_moved.z = z_boundary - monster_moved.radius / global_scale; monster_moved.movement.z *= 0.5};
+    if(monster_moved.z - monster_moved.radius / global_scale < -z_boundary) {monster_moved.z = -z_boundary + monster_moved.radius / global_scale; monster_moved.movement.z *= 0.5};
     if(monster_moved.movement.x > monster_movement_cap) monster_moved.movement.x = monster_movement_cap;
     if(monster_moved.movement.x < -monster_movement_cap) monster_moved.movement.x = -monster_movement_cap;
     if(monster_moved.movement.y > monster_movement_cap) monster_moved.movement.y = monster_movement_cap;
@@ -278,12 +278,13 @@ const age_tentacle_monster = (monster_moved, integer) => {
     if(monster_moved.movement.z > monster_movement_cap) monster_moved.movement.z = monster_movement_cap;
     if(monster_moved.movement.z < -monster_movement_cap) monster_moved.movement.z = -monster_movement_cap;
     for(let i = 0; i < 7; i++) {
-        if(isometric_distance(monster_moved.tentacle[i].x + monster_moved.x, monster_moved.tentacle[i].y + monster_moved.y, monster_moved.tentacle[i].z + monster_moved.z, monster_moved.x, monster_moved.y, monster_moved.z) > 7) {
-            monster_moved.tentacle[i].movement.x = 0;
-            monster_moved.tentacle[i].movement.y = 0;
-            monster_moved.tentacle[i].movement.z = 0;
+        let distance_from_tentacle_center = isometric_distance(monster_moved.tentacle[i].x + monster_moved.x, monster_moved.tentacle[i].y + monster_moved.y, monster_moved.tentacle[i].z + monster_moved.z, monster_moved.x, monster_moved.y + 4.5, monster_moved.z);
+        if(distance_from_tentacle_center > 3.5) {
+            monster_moved.tentacle[i].movement.x *= 0.9;
+            monster_moved.tentacle[i].movement.y *= 0.9;
+            monster_moved.tentacle[i].movement.z *= 0.9;
             if(Math.abs(monster_moved.tentacle[i].x) > 0.15) monster_moved.tentacle[i].x -= Math.sign(monster_moved.tentacle[i].x) * 0.01;
-            if(Math.abs(monster_moved.tentacle[i].y) > 0.15) monster_moved.tentacle[i].y -= Math.sign(monster_moved.tentacle[i].y) * 0.01;
+            if(Math.abs(monster_moved.tentacle[i].y - 3.5) > 0.15) monster_moved.tentacle[i].y -= Math.sign(monster_moved.tentacle[i].y - 3.5) * 0.01;
             if(Math.abs(monster_moved.tentacle[i].z) > 0.15) monster_moved.tentacle[i].z -= Math.sign(monster_moved.tentacle[i].z) * 0.01;
         }
         let tentacle_position = {
@@ -294,12 +295,12 @@ const age_tentacle_monster = (monster_moved, integer) => {
         monster_moved.tentacle[i].x += monster_moved.tentacle[i].movement.x;
         monster_moved.tentacle[i].y += monster_moved.tentacle[i].movement.y;
         monster_moved.tentacle[i].z += monster_moved.tentacle[i].movement.z;
-        if(tentacle_position.x > x_movement_boundary) {monster_moved.tentacle[i].x -= 0.1; monster_moved.tentacle[i].movement.x /= 2};
-        if(tentacle_position.x < -x_movement_boundary) {monster_moved.tentacle[i].x += 0.1; monster_moved.tentacle[i].movement.x /= 2};
-        if(tentacle_position.y > y_movement_boundary) {monster_moved.tentacle[i].y -= 0.1; monster_moved.tentacle[i].movement.y /= 2};
-        if(tentacle_position.y < -y_movement_boundary) {monster_moved.tentacle[i].y += 0.1; monster_moved.tentacle[i].movement.y /= 2};
-        if(tentacle_position.z > z_movement_boundary) {monster_moved.tentacle[i].z -= 0.1; monster_moved.tentacle[i].movement.z /= 2};
-        if(tentacle_position.z < -z_movement_boundary) {monster_moved.tentacle[i].z += 0.1; monster_moved.tentacle[i].movement.z /= 2};
+        if(tentacle_position.x > x_movement_boundary) {monster_moved.tentacle[i].x -= 0.1; monster_moved.tentacle[i].movement.x *= 0.5};
+        if(tentacle_position.x < -x_movement_boundary) {monster_moved.tentacle[i].x += 0.1; monster_moved.tentacle[i].movement.x *= 0.5};
+        if(tentacle_position.y > y_movement_boundary) {monster_moved.tentacle[i].y -= 0.1; monster_moved.tentacle[i].movement.y *= 0.5};
+        if(tentacle_position.y < -y_movement_boundary) {monster_moved.tentacle[i].y += 0.1; monster_moved.tentacle[i].movement.y *= 0.5};
+        if(tentacle_position.z > z_movement_boundary) {monster_moved.tentacle[i].z -= 0.1; monster_moved.tentacle[i].movement.z *= 0.5};
+        if(tentacle_position.z < -z_movement_boundary) {monster_moved.tentacle[i].z += 0.1; monster_moved.tentacle[i].movement.z *= 0.5};
         if(monster_moved.tentacle[i].movement.x > monster_movement_cap) monster_moved.tentacle[i].movement.x = monster_movement_cap;
         if(monster_moved.tentacle[i].movement.x < -monster_movement_cap) monster_moved.tentacle[i].movement.x = -monster_movement_cap;
         if(monster_moved.tentacle[i].movement.y > monster_movement_cap) monster_moved.tentacle[i].movement.y = monster_movement_cap;
@@ -336,9 +337,9 @@ const age_tentacle_monster = (monster_moved, integer) => {
                 }
             }
         } else {
-            monster_moved.tentacle[i].movement.x /= 2;
-            monster_moved.tentacle[i].movement.y /= 2;
-            monster_moved.tentacle[i].movement.z /= 2;
+            monster_moved.tentacle[i].movement.x *= 0.5;
+            monster_moved.tentacle[i].movement.y *= 0.5;
+            monster_moved.tentacle[i].movement.z *= 0.5;
             if(Math.abs(monster_moved.tentacle[i].x) > 0.06) monster_moved.tentacle[i].x -= Math.sign(monster_moved.tentacle[i].x) * 0.05;
             if(Math.abs(monster_moved.tentacle[i].y) > 0.06) monster_moved.tentacle[i].y -= Math.sign(monster_moved.tentacle[i].y) * 0.05;
             if(Math.abs(monster_moved.tentacle[i].z) > 0.06) monster_moved.tentacle[i].z -= Math.sign(monster_moved.tentacle[i].z) * 0.05;
@@ -380,15 +381,15 @@ const age_bubbles = () => {
         bubble_moved.x += bubble_moved.movement.x;
         bubble_moved.y += bubble_moved.movement.y;
         bubble_moved.z += bubble_moved.movement.z;
-        if(bubble_moved.x > x_boundary) {bubble_moved.x = x_boundary; bubble_moved.movement.x /= 2};
-        if(bubble_moved.x < -x_boundary) {bubble_moved.x = -x_boundary; bubble_moved.movement.x /= 2};
-        if(bubble_moved.z > z_boundary) {bubble_moved.z = z_boundary; bubble_moved.movement.z /= 2};
-        if(bubble_moved.z < -z_boundary) {bubble_moved.z = -z_boundary; bubble_moved.movement.z /= 2};
+        if(bubble_moved.x > x_boundary) {bubble_moved.x = x_boundary; bubble_moved.movement.x *= 0.5};
+        if(bubble_moved.x < -x_boundary) {bubble_moved.x = -x_boundary; bubble_moved.movement.x *= 0.5};
+        if(bubble_moved.z > z_boundary) {bubble_moved.z = z_boundary; bubble_moved.movement.z *= 0.5};
+        if(bubble_moved.z < -z_boundary) {bubble_moved.z = -z_boundary; bubble_moved.movement.z *= 0.5};
         if(bubble_moved.movement.x > bubble_movement_cap) bubble_moved.movement.x = bubble_movement_cap;
         if(bubble_moved.movement.x < -bubble_movement_cap) bubble_moved.movement.x = -bubble_movement_cap;
         if(bubble_moved.movement.z > bubble_movement_cap) bubble_moved.movement.z = bubble_movement_cap;
         if(bubble_moved.movement.z < -bubble_movement_cap) bubble_moved.movement.z = -bubble_movement_cap;
-        if(bubble_moved.y > y_boundary) {bubble_moved.y = y_boundary; bubble_moved.movement.y /= 2};
+        if(bubble_moved.y > y_boundary) {bubble_moved.y = y_boundary; bubble_moved.movement.y *= 0.5};
         if(bubble_moved.y < -y_boundary) {bubble.splice(i, 1); i--};
     }
 }
@@ -413,11 +414,11 @@ const age_food = (food_moved, integer) => {
     food_moved.x += food_moved.movement.x;
     food_moved.y += food_moved.movement.y;
     food_moved.z += food_moved.movement.z;
-    if(food_moved.x > x_boundary) {food_moved.x = x_boundary; food_moved.movement.x /= 2};
-    if(food_moved.x < -x_boundary) {food_moved.x = -x_boundary; food_moved.movement.x /= 2};
-    if(food_moved.z > z_boundary) {food_moved.z = z_boundary; food_moved.movement.z /= 2};
-    if(food_moved.z < -z_boundary) {food_moved.z = -z_boundary; food_moved.movement.z /= 2};
-    if(food_moved.y < -y_boundary) {food_moved.y = -y_boundary; food_moved.movement.y /= 2};
+    if(food_moved.x > x_boundary) {food_moved.x = x_boundary; food_moved.movement.x *= 0.5};
+    if(food_moved.x < -x_boundary) {food_moved.x = -x_boundary; food_moved.movement.x *= 0.5};
+    if(food_moved.z > z_boundary) {food_moved.z = z_boundary; food_moved.movement.z *= 0.5};
+    if(food_moved.z < -z_boundary) {food_moved.z = -z_boundary; food_moved.movement.z *= 0.5};
+    if(food_moved.y < -y_boundary) {food_moved.y = -y_boundary; food_moved.movement.y *= 0.5};
     if(food_moved.y > y_boundary) {
         food_moved.y = y_boundary;
         delete food_moved.movement;
@@ -464,12 +465,12 @@ const age_fish = (fish_moved, integer) => {
     fish_moved.y += fish_moved.movement.y;
     fish_moved.z += fish_moved.movement.z;
     ctx_opaque.fillStyle = `#44f`;
-    if(fish_moved.x > x_movement_boundary) {fish_moved.x = x_movement_boundary; fish_moved.movement.x /= 2};
-    if(fish_moved.x < -x_movement_boundary) {fish_moved.x = -x_movement_boundary; fish_moved.movement.x /= 2};
-    if(fish_moved.y > y_movement_boundary) {fish_moved.y = y_movement_boundary; fish_moved.movement.y /= 2};
-    if(fish_moved.y < -y_movement_boundary) {fish_moved.y = -y_movement_boundary; fish_moved.movement.y /= 2};
-    if(fish_moved.z > z_movement_boundary) {fish_moved.z = z_movement_boundary; fish_moved.movement.z /= 2};
-    if(fish_moved.z < -z_movement_boundary) {fish_moved.z = -z_movement_boundary; fish_moved.movement.z /= 2};
+    if(fish_moved.x > x_movement_boundary) {fish_moved.x = x_movement_boundary; fish_moved.movement.x *= 0.5};
+    if(fish_moved.x < -x_movement_boundary) {fish_moved.x = -x_movement_boundary; fish_moved.movement.x *= 0.5};
+    if(fish_moved.y > y_movement_boundary) {fish_moved.y = y_movement_boundary; fish_moved.movement.y *= 0.5};
+    if(fish_moved.y < -y_movement_boundary) {fish_moved.y = -y_movement_boundary; fish_moved.movement.y *= 0.5};
+    if(fish_moved.z > z_movement_boundary) {fish_moved.z = z_movement_boundary; fish_moved.movement.z *= 0.5};
+    if(fish_moved.z < -z_movement_boundary) {fish_moved.z = -z_movement_boundary; fish_moved.movement.z *= 0.5};
     if(fish_moved.movement.x > fish_movement_cap) fish_moved.movement.x = fish_movement_cap;
     if(fish_moved.movement.x < -fish_movement_cap) fish_moved.movement.x = -fish_movement_cap;
     if(fish_moved.movement.y > fish_movement_cap) fish_moved.movement.y = fish_movement_cap;
@@ -658,7 +659,7 @@ const new_creature = (array, quantity, random, x, y, z) => {
             for(let i = 0; i < 7; i++) {
                 new_creature_object.tentacle[i] = {x, y, z, movement: {x: 0, y: 0, z: 0}, prey_held: false, prey: {}, prey_id: 0};
                 new_creature_object.tentacle[i].x = (Math.random() * 7) - 3.5;
-                new_creature_object.tentacle[i].y = (Math.random() * 4) - 2;
+                new_creature_object.tentacle[i].y = (Math.random() * 7);
                 new_creature_object.tentacle[i].z = (Math.random() * 7) - 3.5;
             }
             new_creature_object.move_cycle -= Math.floor(Math.random() * -50);
@@ -685,10 +686,10 @@ const age_snail = (snail_moved, integer) => {
     snail_moved.x += snail_moved.movement.x;
     snail_moved.z += snail_moved.movement.z;
     ctx_opaque.fillStyle = `#44f`;
-    if(snail_moved.x > x_movement_boundary) {snail_moved.x = x_movement_boundary; snail_moved.movement.x /= 2};
-    if(snail_moved.x < -x_movement_boundary) {snail_moved.x = -x_movement_boundary; snail_moved.movement.x /= 2};
-    if(snail_moved.z > z_movement_boundary) {snail_moved.z = z_movement_boundary; snail_moved.movement.z /= 2};
-    if(snail_moved.z < -z_movement_boundary) {snail_moved.z = -z_movement_boundary; snail_moved.movement.z /= 2};
+    if(snail_moved.x > x_movement_boundary) {snail_moved.x = x_movement_boundary; snail_moved.movement.x *= 0.5};
+    if(snail_moved.x < -x_movement_boundary) {snail_moved.x = -x_movement_boundary; snail_moved.movement.x *= 0.5};
+    if(snail_moved.z > z_movement_boundary) {snail_moved.z = z_movement_boundary; snail_moved.movement.z *= 0.5};
+    if(snail_moved.z < -z_movement_boundary) {snail_moved.z = -z_movement_boundary; snail_moved.movement.z *= 0.5};
     if(snail_moved.movement.x > snail_movement_cap) snail_moved.movement.x = snail_movement_cap;
     if(snail_moved.movement.x < -snail_movement_cap) snail_moved.movement.x = -snail_movement_cap;
     if(snail_moved.movement.z > snail_movement_cap) snail_moved.movement.z = snail_movement_cap;
