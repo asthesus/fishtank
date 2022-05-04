@@ -71,7 +71,6 @@ const fish = [];
 let fish_food_requirement = 10;
 let fish_movement_cap = 0.03;
 let fish_cap = 500;
-let fish_ever_created = 0;
 const snail = [];
 let snail_food_requirement = 30;
 let snail_movement_cap = 0.01;
@@ -229,7 +228,7 @@ const draw_tentacle_monster = (integer) => {
     let mapped = isometric_to_screen(tentacle_monster[integer].x, tentacle_monster[integer].y, tentacle_monster[integer].z);
     ctx_transparent.lineWidth = 2;
     ctx_transparent.strokeStyle = `#f8a`;
-    ctx_transparent.fillStyle = `#ff90b080`;
+    ctx_transparent.fillStyle = `#ff90b0e0`;
     for(let i = 0; i < 7; i++) {
         let mapped_tentacle = isometric_to_screen(tentacle_monster[integer].x + tentacle_monster[integer].tentacle[i].x, tentacle_monster[integer].y + tentacle_monster[integer].tentacle[i].y, tentacle_monster[integer].z + tentacle_monster[integer].tentacle[i].z);
         ctx_transparent.beginPath();
@@ -432,13 +431,13 @@ const age_food = (food_moved, integer) => {
 const age_foods = () => {
     for(let i = 0; i < food.length; i++) age_food(food[i], i);
 }
-const draw_foods = () => {
-    for(let i = 0; i < food.length; i++) {
-        ctx_transparent.fillStyle = `#ff0`;
-        let mapped = isometric_to_screen(food[i].x, food[i].y, food[i].z);
-        ctx_transparent.fillRect(mapped.x, mapped.y, 1, 1);
-    }
-}
+// const draw_food = () => {
+//     for(let i = 0; i < food.length; i++) {
+//         ctx_transparent.fillStyle = `#ff0`;
+//         let mapped = isometric_to_screen(food[i].x, food[i].y, food[i].z);
+//         ctx_transparent.fillRect(mapped.x, mapped.y, 1, 1);
+//     }
+// }
 const draw_static_food = (integer) => {
     ctx_static_transparent.fillStyle = `#660`;
     let mapped = isometric_to_screen(static_food[integer].x, y_boundary, static_food[integer].z);
@@ -578,16 +577,19 @@ const draw_fish = (integer) => {
     }
     ctx_transparent.drawImage(fish_image, mapped.x - 16, mapped.y - 16);
 }
-const draw_water_creatures = () => {
+const draw_water_objects = () => {
     let proximity_list = [];
     let draw_list = [];
-    for(let i = 0; i < fish.length; i++) {
-        proximity_list[i] = Math.sqrt(Math.abs(fish[i].x - x_boundary) ** 2 + Math.abs(fish[i].z - -z_boundary) ** 2);
+    for(let i = 0; i < food.length; i++) {
+        proximity_list[i] = Math.sqrt(Math.abs(food[i].x - x_boundary) ** 2 + Math.abs(food[i].z - -z_boundary) ** 2);
     }
-    for(let i = fish.length; i < fish.length + tentacle_monster.length; i++) {
-        proximity_list[i] = Math.sqrt(Math.abs(tentacle_monster[i - fish.length].x - x_boundary) ** 2 + Math.abs(tentacle_monster[i - fish.length].z - -z_boundary) ** 2);
+    for(let i = food.length; i < food.length + fish.length; i++) {
+        proximity_list[i] = Math.sqrt(Math.abs(fish[i - food.length].x - x_boundary) ** 2 + Math.abs(fish[i - food.length].z - -z_boundary) ** 2);
     }
-    while(draw_list.length < fish.length + tentacle_monster.length) {
+    for(let i = food.length + fish.length; i < food.length + fish.length + tentacle_monster.length; i++) {
+        proximity_list[i] = Math.sqrt(Math.abs(tentacle_monster[i - food.length - fish.length].x - x_boundary) ** 2 + Math.abs(tentacle_monster[i - food.length - fish.length].z - -z_boundary) ** 2);
+    }
+    while(draw_list.length < food.length + fish.length + tentacle_monster.length) {
         let closest = 0;
         let closest_creature = 0;
         for(let i = 0; i < proximity_list.length; i++) {
@@ -601,10 +603,14 @@ const draw_water_creatures = () => {
     }
     for(let i = 0; i < draw_list.length; i++) {
         let integer = draw_list[i];
-        if(integer < fish.length) {
-            draw_fish(integer);
+        if(integer < food.length) {
+            ctx_transparent.fillStyle = `#ff0`;
+            let mapped = isometric_to_screen(food[integer].x, food[integer].y, food[integer].z);
+            ctx_transparent.fillRect(mapped.x, mapped.y, 1, 1);
+        } else if(integer < food.length + fish.length) {
+            draw_fish(integer - food.length);
         } else {
-            draw_tentacle_monster(integer - fish.length);
+            draw_tentacle_monster(integer - food.length - fish.length);
         }
     }
 }
@@ -615,7 +621,7 @@ const new_creature = (array, quantity, random, x, y, z) => {
             let movement_x = (Math.random() * 2 - 1) * 0.01;
             let movement_y = (Math.random() * 2 - 1) * 0.001;
             let movement_z = (Math.random() * 2 - 1) * 0.01;
-            let new_creature_object = {x: x, y: y, z: z, movement: {x: movement_x, y: movement_y, z: movement_z}, starvation: 0, food: 0, move_cycle: 0, flip_cycle: 0, flip: false, id: fish_ever_created};
+            let new_creature_object = {x: x, y: y, z: z, movement: {x: movement_x, y: movement_y, z: movement_z}, starvation: 0, food: 0, move_cycle: 0, flip_cycle: 0, flip: false, id: Symbol()};
             if(random) {
                 new_creature_object.x = random_isometric(x_boundary);
                 new_creature_object.y = random_isometric(y_boundary);
@@ -624,7 +630,6 @@ const new_creature = (array, quantity, random, x, y, z) => {
             new_creature_object.move_cycle -= Math.floor(Math.random() * -50);
             new_creature_object.starvation += Math.floor(Math.random() * fish_starvation_cap * 0.5);
             fish.push(new_creature_object);
-            fish_ever_created++;
         }
         if(array === snail) {
             let movement_x = (Math.random() * 2 - 1) * 0.001;
@@ -982,8 +987,8 @@ const sub_time = () => {
         draw_axis(cursor_selection.x, cursor_selection.y, cursor_selection.z);
     }
     draw_snails();
-    draw_foods();
-    draw_water_creatures();
+    // draw_food();
+    draw_water_objects();
     // draw_tentacle_monsters();
     draw_bubbles();
     draw_global_wireframe_front();
