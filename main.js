@@ -53,6 +53,7 @@ let x_boundary = 30;
 let y_boundary = 20;
 let z_boundary = 20;
 const boundary_map = {};
+const movement_boundary_map = {};
 let x_movement_boundary = 29.5;
 let y_movement_boundary = 19;
 let z_movement_boundary = 19.5;
@@ -168,8 +169,8 @@ const find_boundary_coordinates = () => {
     boundary_map.g = isometric_to_screen(-x_boundary, -y_boundary, -z_boundary);
     boundary_map.h = isometric_to_screen(-x_boundary, -y_boundary, z_boundary);
 }
-const screen_to_isometric = (x, y) => {
-    y = (y + y_boundary * global_scale * global_height) / global_skew * 2;
+const screen_to_isometric = (x, y, elevation) => {
+    y = (y + elevation * global_scale * global_height) / global_skew * 2;
     x /= global_scale;
     y /= global_scale;
     let mapped = {};
@@ -192,18 +193,32 @@ const draw_ground = (alpha) => {
     ctx_opaque.fill();
 }
 const draw_water = () => {
+    //     h
+    //     .
+    // g.     .e
+    //     .f
+    //     
+    //     .d
+    // c.     .a
+    //     .
+    //     b
+    water_boundary_e = isometric_to_screen(x_boundary, -y_movement_boundary, z_boundary);
+    water_boundary_f = isometric_to_screen(x_boundary, -y_movement_boundary, -z_boundary);
+    water_boundary_g = isometric_to_screen(-x_boundary, -y_movement_boundary, -z_boundary);
+    water_boundary_h = isometric_to_screen(-x_boundary, -y_movement_boundary, z_boundary);
+
     ctx_opaque.fillStyle = `#0070ff28`;
     ctx_opaque.beginPath();
     ctx_opaque.moveTo(boundary_map.a.x, boundary_map.a.y);
     ctx_opaque.lineTo(boundary_map.d.x, boundary_map.d.y);
     ctx_opaque.lineTo(boundary_map.c.x, boundary_map.c.y);
-    ctx_opaque.lineTo(boundary_map.g.x, boundary_map.g.y);
+    ctx_opaque.lineTo(water_boundary_g.x, water_boundary_g.y);
     if(global_skew > 0) {
-        ctx_opaque.lineTo(boundary_map.h.x, boundary_map.h.y);
+        ctx_opaque.lineTo(water_boundary_h.x, water_boundary_h.y);
     } else {
-        ctx_opaque.lineTo(boundary_map.f.x, boundary_map.f.y);
+        ctx_opaque.lineTo(water_boundary_f.x, water_boundary_f.y);
     }
-    ctx_opaque.lineTo(boundary_map.e.x, boundary_map.e.y);
+    ctx_opaque.lineTo(water_boundary_e.x, water_boundary_e.y);
     ctx_opaque.lineTo(boundary_map.a.x, boundary_map.a.y);
     ctx_opaque.fill();
 }
@@ -246,7 +261,7 @@ const draw_bubbles = () => {
     }
 }
 const new_food = (x, z) => {
-    let new_food_object = {x: x, y: -y_boundary, z: z};
+    let new_food_object = {x: x, y: -y_movement_boundary, z: z};
     new_food_object.movement = {x: (Math.random() * 2 - 1) * 0.01, y: (Math.random() * 2 - 1) * 0.01, z: (Math.random() * 2 - 1) * 0.01};
     food.push(new_food_object);
 }
@@ -270,7 +285,7 @@ const age_food = (food_moved, integer) => {
         static_food.push(food_moved);
         draw_static_food(static_food.length - 1);
     }
-    if(food_moved.y < -y_boundary) {food_moved.y = -y_boundary; food_moved.movement.y /= 2};
+    if(food_moved.y < -y_movement_boundary) {food_moved.y = -y_movement_boundary; food_moved.movement.y /= 2};
 }
 const age_foods = () => {
     for(let i = 0; i < food.length; i++) age_food(food[i], i);
@@ -778,6 +793,16 @@ const draw_global_wireframe_back = () => {
     ctx_opaque.stroke();
 }
 const draw_global_wireframe_front = () => {
+    if(global_skew < 0) {
+        ctx_transparent.fillStyle = `#302000`;
+        ctx_transparent.beginPath();
+        ctx_transparent.moveTo(boundary_map.a.x, boundary_map.a.y);
+        ctx_transparent.lineTo(boundary_map.b.x, boundary_map.b.y);
+        ctx_transparent.lineTo(boundary_map.c.x, boundary_map.c.y);
+        ctx_transparent.lineTo(boundary_map.d.x, boundary_map.d.y);
+        ctx_transparent.lineTo(boundary_map.a.x, boundary_map.a.y);
+        ctx_transparent.fill();
+    }
     // column
     ctx_transparent.strokeStyle = `#50505050`;
     ctx_transparent.beginPath();
@@ -820,7 +845,7 @@ const cursor_select = () => {
 }
 const sub_time = () => {
     ctx_transparent.clearRect(0, 0, canvas.width, canvas.height);
-    let mapped_cursor = screen_to_isometric(cursor_x, cursor_y);
+    let mapped_cursor = screen_to_isometric(cursor_x, cursor_y, y_movement_boundary);
     cursor_over_top = false;
     if(global_skew > 0 && !left_click.held && food.length < food_cap && !(mapped_cursor.x < -x_boundary || mapped_cursor.x > x_boundary || mapped_cursor.z < -z_boundary || mapped_cursor.z > z_boundary)) {
         cursor_over_top = true;
@@ -845,16 +870,6 @@ const sub_time = () => {
     draw_foods();
     draw_fishes();
     draw_bubbles();
-    if(global_skew < 0) {
-        ctx_transparent.fillStyle = `#302000`;
-        ctx_transparent.beginPath();
-        ctx_transparent.moveTo(boundary_map.a.x, boundary_map.a.y);
-        ctx_transparent.lineTo(boundary_map.b.x, boundary_map.b.y);
-        ctx_transparent.lineTo(boundary_map.c.x, boundary_map.c.y);
-        ctx_transparent.lineTo(boundary_map.d.x, boundary_map.d.y);
-        ctx_transparent.lineTo(boundary_map.a.x, boundary_map.a.y);
-        ctx_transparent.fill();
-    }
     draw_global_wireframe_front();
 }
 const time = () => {
@@ -931,10 +946,8 @@ new_creature(snail, 4, true);
 time();
 draw_global_wireframe_back();
 
-// for clicking on fish: map each fish to its 2d position, then check the distances between those positions and the cursor. shortest distance under a certain distance is selected fish
+// make a random portal appear, with a tentacle that comes out of the portal, grabs a fish, and pulls it back through
 
 // allow player to pick up shells from dead snails for points
-
-// simulate some degree of fluid motion and allow the cursor to move stuff around in the tank
 
 // use a similar gameplay loop to insane aquarium deluxe
