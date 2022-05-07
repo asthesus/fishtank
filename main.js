@@ -36,6 +36,22 @@ let fish_w_flip_png = document.getElementById(`fish5flip_png`);
 let fish_e_flip_png = document.getElementById(`fish6flip_png`);
 let fish_s_flip_png = document.getElementById(`fish7flip_png`);
 let fish_n_flip_png = document.getElementById(`fish8flip_png`);
+let piranha_sw_png = document.getElementById(`piranha1_png`);
+let piranha_se_png = document.getElementById(`piranha2_png`);
+let piranha_nw_png = document.getElementById(`piranha3_png`);
+let piranha_ne_png = document.getElementById(`piranha4_png`);
+let piranha_w_png = document.getElementById(`piranha5_png`);
+let piranha_e_png = document.getElementById(`piranha6_png`);
+let piranha_s_png = document.getElementById(`piranha7_png`);
+let piranha_n_png = document.getElementById(`piranha8_png`);
+let piranha_sw_flip_png = document.getElementById(`piranha1flip_png`);
+let piranha_se_flip_png = document.getElementById(`piranha2flip_png`);
+let piranha_nw_flip_png = document.getElementById(`piranha3flip_png`);
+let piranha_ne_flip_png = document.getElementById(`piranha4flip_png`);
+let piranha_w_flip_png = document.getElementById(`piranha5flip_png`);
+let piranha_e_flip_png = document.getElementById(`piranha6flip_png`);
+let piranha_s_flip_png = document.getElementById(`piranha7flip_png`);
+let piranha_n_flip_png = document.getElementById(`piranha8flip_png`);
 //
 ctx_opaque.translate(0.5, 0.5);
 ctx_opaque.lineWidth = 1;
@@ -57,11 +73,9 @@ const boundary_map = {};
 let x_movement_boundary = 29.5;
 let y_movement_boundary = 19;
 let z_movement_boundary = 19.5;
-let fish_starvation_cap = 2000000;
-let snail_starvation_cap = 2000000;
-let monster_starvation_cap = 20000;
 const tentacle_monster = [];
 let monster_movement_cap = 0.04;
+let monster_starvation_cap = 20000;
 const bubble = [];
 let bubble_movement_cap = 0.025;
 const blood = [];
@@ -70,10 +84,17 @@ const static_food = [];
 let food_cap = 2000;
 const fish = [];
 let fish_food_requirement = 10;
+let fish_starvation_cap = 2000000;
 let fish_movement_cap = 0.03;
 let fish_cap = 500;
+const piranha = [];
+let piranha_food_requirement = 10;
+let piranha_starvation_cap = 1000000;
+let piranha_movement_cap = 0.03;
+let piranha_cap = 500;
 const snail = [];
 let snail_food_requirement = 30;
+let snail_starvation_cap = 2000000;
 let snail_movement_cap = 0.01;
 let snail_cap = 500;
 const shell = [];
@@ -129,6 +150,18 @@ const reskew = (value) => {
         fish_n_png = document.getElementById(`fish8_png`);
         fish_s_flip_png = document.getElementById(`fish7flip_png`);
         fish_n_flip_png = document.getElementById(`fish8flip_png`);
+        piranha_sw_png = document.getElementById(`piranha1_png`);
+        piranha_se_png = document.getElementById(`piranha2_png`);
+        piranha_nw_png = document.getElementById(`piranha3_png`);
+        piranha_ne_png = document.getElementById(`piranha4_png`);
+        piranha_sw_flip_png = document.getElementById(`piranha1flip_png`);
+        piranha_se_flip_png = document.getElementById(`piranha2flip_png`);
+        piranha_nw_flip_png = document.getElementById(`piranha3flip_png`);
+        piranha_ne_flip_png = document.getElementById(`piranha4flip_png`);
+        piranha_s_png = document.getElementById(`piranha7_png`);
+        piranha_n_png = document.getElementById(`piranha8_png`);
+        piranha_s_flip_png = document.getElementById(`piranha7flip_png`);
+        piranha_n_flip_png = document.getElementById(`piranha8flip_png`);
     } else {
         fish_nw_png = document.getElementById(`fish1_png`);
         fish_ne_png = document.getElementById(`fish2_png`);
@@ -142,6 +175,18 @@ const reskew = (value) => {
         fish_s_png = document.getElementById(`fish8_png`);
         fish_n_flip_png = document.getElementById(`fish7flip_png`);
         fish_s_flip_png = document.getElementById(`fish8flip_png`);
+        piranha_nw_png = document.getElementById(`piranha1_png`);
+        piranha_ne_png = document.getElementById(`piranha2_png`);
+        piranha_sw_png = document.getElementById(`piranha3_png`);
+        piranha_se_png = document.getElementById(`piranha4_png`);
+        piranha_nw_flip_png = document.getElementById(`piranha1flip_png`);
+        piranha_ne_flip_png = document.getElementById(`piranha2flip_png`);
+        piranha_sw_flip_png = document.getElementById(`piranha3flip_png`);
+        piranha_se_flip_png = document.getElementById(`piranha4flip_png`);
+        piranha_n_png = document.getElementById(`piranha7_png`);
+        piranha_s_png = document.getElementById(`piranha8_png`);
+        piranha_n_flip_png = document.getElementById(`piranha7flip_png`);
+        piranha_s_flip_png = document.getElementById(`piranha8flip_png`);
     }
     find_boundary_coordinates();
     draw_background();
@@ -614,6 +659,142 @@ const draw_fish = (integer) => {
     }
     ctx_transparent.drawImage(fish_image, mapped.x - 16, mapped.y - 16);
 }
+const age_piranha = (piranha_moved, integer) => {
+    piranha_moved.starvation++;
+    piranha_moved.flip_cycle++;
+    piranha_moved.move_cycle++;
+    if(piranha_moved.flip_cycle >= 100) {
+        piranha_moved.flip_cycle = Math.floor(Math.random() * 75);
+        piranha_moved.flip = !piranha_moved.flip;
+    }
+    if(piranha_moved.move_cycle >= 200) {
+        let food_boost = fish.length;
+        if(food_boost > 500) food_boost = 500;
+        piranha_moved.move_cycle = Math.floor(Math.random() * -50) + Math.floor(food_boost * 0.3);
+        piranha_moved.movement.x += (Math.random() * 2 - 1) * 0.005 * (food_boost * 0.3 + 1);
+        piranha_moved.movement.y += (Math.random() * 2 - 1) * 0.0005 * (food_boost * 0.3 + 1);
+        piranha_moved.movement.z += (Math.random() * 2 - 1) * 0.005 * (food_boost * 0.3 + 1);
+    }
+    piranha_moved.x += piranha_moved.movement.x;
+    piranha_moved.y += piranha_moved.movement.y;
+    piranha_moved.z += piranha_moved.movement.z;
+    ctx_opaque.fillStyle = `#44f`;
+    if(piranha_moved.x > x_movement_boundary) {piranha_moved.x = x_movement_boundary; piranha_moved.movement.x *= 0.5};
+    if(piranha_moved.x < -x_movement_boundary) {piranha_moved.x = -x_movement_boundary; piranha_moved.movement.x *= 0.5};
+    if(piranha_moved.y > y_movement_boundary) {piranha_moved.y = y_movement_boundary; piranha_moved.movement.y *= 0.5};
+    if(piranha_moved.y < -y_movement_boundary) {piranha_moved.y = -y_movement_boundary; piranha_moved.movement.y *= 0.5};
+    if(piranha_moved.z > z_movement_boundary) {piranha_moved.z = z_movement_boundary; piranha_moved.movement.z *= 0.5};
+    if(piranha_moved.z < -z_movement_boundary) {piranha_moved.z = -z_movement_boundary; piranha_moved.movement.z *= 0.5};
+    if(piranha_moved.movement.x > piranha_movement_cap) piranha_moved.movement.x = piranha_movement_cap;
+    if(piranha_moved.movement.x < -piranha_movement_cap) piranha_moved.movement.x = -piranha_movement_cap;
+    if(piranha_moved.movement.y > piranha_movement_cap) piranha_moved.movement.y = piranha_movement_cap;
+    if(piranha_moved.movement.y < -piranha_movement_cap) piranha_moved.movement.y = -piranha_movement_cap;
+    if(piranha_moved.movement.z > piranha_movement_cap) piranha_moved.movement.z = piranha_movement_cap;
+    if(piranha_moved.movement.z < -piranha_movement_cap) piranha_moved.movement.z = -piranha_movement_cap;
+    // eat
+    let fed = false;
+    for(let ii = 0; ii < fish.length; ii++) {
+        if(Math.abs(piranha_moved.x - fish[ii].x) <= 1 && Math.abs(piranha_moved.y - fish[ii].y) <= 1 && Math.abs(piranha_moved.z - fish[ii].z) <= 1) {
+            distance_from_fish = Math.sqrt((Math.abs(piranha_moved.x - fish[ii].x) ** 2) + (Math.abs(piranha_moved.y - fish[ii].y) ** 2) + (Math.abs(piranha_moved.z - fish[ii].z) ** 2));
+            if(distance_from_fish <= 1) {
+                if(Math.random() > 0.5) new_bubbles(fish[ii].x, fish[ii].y, fish[ii].z, Math.floor(Math.random() * 2) + 1);
+                new_blood(fish[ii].x, fish[ii].y, fish[ii].z, Math.floor(Math.random() * 10 + 10));
+                fish.splice(ii, 1);
+                fed = true;
+                ii--;
+            }
+        }
+    }
+    if(fed) {
+        piranha_moved.move_cycle = 200;
+        piranha_moved.food++;
+        piranha_moved.starvation = 0;
+    }
+    if(fed && piranha_moved.food >= piranha_food_requirement && piranha.length < piranha_cap) {
+        piranha_moved.food = 0;
+        new_creature(piranha, 1, false, piranha_moved.x, piranha_moved.y, piranha_moved.z);
+    }
+    if(piranha_moved.starvation >= piranha_starvation_cap) {
+        if(piranha_moved.food > 0) {piranha_moved.food--} else piranha.splice(integer, 1);
+    }
+}
+const age_piranhas = () => {
+    for(let i = 0; i < piranha.length; i++) age_piranha(piranha[i], i);
+}
+const draw_piranha = (integer) => {
+    let mapped = isometric_to_screen(piranha[integer].x, piranha[integer].y, piranha[integer].z);
+    let piranha_image;
+    if(piranha[integer].movement.x <= 0) {
+        if(piranha[integer].movement.z <= 0) {
+            if(piranha[integer].movement.x / piranha[integer].movement.z <= 1) {
+                // east
+                if(piranha[integer].flip) {
+                    piranha_image = piranha_e_flip_png;
+                } else {
+                    piranha_image = piranha_e_png;
+                }
+            } else {
+                // north east
+                if(piranha[integer].flip) {
+                    piranha_image = piranha_ne_flip_png;
+                } else {
+                    piranha_image = piranha_ne_png;
+                }
+            }
+        } else {
+            if(piranha[integer].movement.x / piranha[integer].movement.z <= -1) {
+                // north
+                if(piranha[integer].flip) {
+                    piranha_image = piranha_n_flip_png;
+                } else {
+                    piranha_image = piranha_n_png;
+                }
+            } else {
+                // north west
+                if(piranha[integer].flip) {
+                    piranha_image = piranha_nw_flip_png;
+                } else {
+                    piranha_image = piranha_nw_png;
+                }
+            }
+        }
+    } else {
+        if(piranha[integer].movement.z <= 0) {
+            if(piranha[integer].movement.x / piranha[integer].movement.z <= -1) {
+                // south
+                if(piranha[integer].flip) {
+                    piranha_image = piranha_s_flip_png;
+                } else {
+                    piranha_image = piranha_s_png;
+                }
+            } else {
+                // south east
+                if(piranha[integer].flip) {
+                    piranha_image = piranha_se_flip_png;
+                } else {
+                    piranha_image = piranha_se_png;
+                }
+            }
+        } else {
+            if(piranha[integer].movement.x / piranha[integer].movement.z <= 1) {
+                // west
+                if(piranha[integer].flip) {
+                    piranha_image = piranha_w_flip_png;
+                } else {
+                    piranha_image = piranha_w_png;
+                }
+            } else {
+                // south west
+                if(piranha[integer].flip) {
+                    piranha_image = piranha_sw_flip_png;
+                } else {
+                    piranha_image = piranha_sw_png;
+                }
+            }
+        }
+    }
+    ctx_transparent.drawImage(piranha_image, mapped.x - 16, mapped.y - 16);
+}
 const draw_water_objects = () => {
     let proximity_list = [];
     let draw_list = [];
@@ -642,6 +823,11 @@ const draw_water_objects = () => {
         proximity_list[i] = Math.sqrt(Math.abs(bubble[index].x - x_boundary) ** 2 + Math.abs(bubble[index].z - -z_boundary) ** 2);
     }
     sum_array_lengths += bubble.length;
+    for(let i = sum_array_lengths; i < sum_array_lengths + piranha.length; i++) {
+        let index = i - sum_array_lengths;
+        proximity_list[i] = Math.sqrt(Math.abs(piranha[index].x - x_boundary) ** 2 + Math.abs(piranha[index].z - -z_boundary) ** 2);
+    }
+    sum_array_lengths += piranha.length;
     while(draw_list.length < sum_array_lengths) {
         let closest = 0;
         let closest_thing = 0;
@@ -669,13 +855,16 @@ const draw_water_objects = () => {
             ctx_transparent.fillStyle = `#e22`;
             let mapped = isometric_to_screen(blood[index].x, blood[index].y, blood[index].z);
             ctx_transparent.fillRect(mapped.x - blood[index].size / 200, mapped.y - blood[index].size / 200, blood[index].size / 100, blood[index].size / 100);
-        } else {
+        } else if(integer < food.length + fish.length + tentacle_monster.length + blood.length + bubble.length) {
             let index = integer - food.length - fish.length - tentacle_monster.length - blood.length;
             ctx_transparent.strokeStyle = `#70ffff70`;
             let mapped = isometric_to_screen(bubble[index].x, bubble[index].y, bubble[index].z);
             ctx_transparent.beginPath();
             ctx_transparent.arc(mapped.x, mapped.y, bubble[index].size / 2, 0, Math.PI * 2);
             ctx_transparent.stroke();
+        } else if(integer < food.length + fish.length + tentacle_monster.length + blood.length + bubble.length + piranha.length) {
+            let index = integer - food.length - fish.length - tentacle_monster.length - blood.length - bubble.length;
+            draw_piranha(index);
         }
     }
 }
@@ -695,6 +884,20 @@ const new_creature = (array, quantity, random, x, y, z) => {
             new_creature_object.move_cycle -= Math.floor(Math.random() * -50);
             new_creature_object.starvation += Math.floor(Math.random() * fish_starvation_cap * 0.5);
             fish.push(new_creature_object);
+        }
+        if(array === piranha) {
+            let movement_x = (Math.random() * 2 - 1) * 0.05;
+            let movement_y = (Math.random() * 2 - 1) * 0.005;
+            let movement_z = (Math.random() * 2 - 1) * 0.05;
+            let new_creature_object = {x: x, y: y, z: z, movement: {x: movement_x, y: movement_y, z: movement_z}, starvation: 0, food: 0, move_cycle: 0, flip_cycle: 0, flip: false, id: Symbol()};
+            if(random) {
+                new_creature_object.x = random_isometric(x_boundary);
+                new_creature_object.y = random_isometric(y_boundary);
+                new_creature_object.z = random_isometric(z_boundary);
+            }
+            new_creature_object.move_cycle -= Math.floor(Math.random() * -50);
+            new_creature_object.starvation += Math.floor(Math.random() * piranha_starvation_cap * 0.5);
+            piranha.push(new_creature_object);
         }
         if(array === snail) {
             let movement_x = (Math.random() * 2 - 1) * 0.001;
@@ -1040,6 +1243,7 @@ const sub_time = () => {
         age_bloods();
         age_tentacle_monsters();
         age_fishes();
+        age_piranhas();
         age_snails();
         age_bubbles();
         global_tick++;
@@ -1128,9 +1332,10 @@ const keyDown = (e) => {
 document.addEventListener(`keydown`, keyDown);
 window.addEventListener(`resize`, fit_canvas, false);
 fit_canvas();
-new_creature(fish, 64, true);
+new_creature(piranha, 4, true);
+new_creature(fish, 128, true);
 new_creature(snail, 4, true);
-new_creature(tentacle_monster, 3, true);
+// new_creature(tentacle_monster, 3, true);
 time();
 draw_global_wireframe_back();
 
