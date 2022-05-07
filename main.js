@@ -64,6 +64,7 @@ const tentacle_monster = [];
 let monster_movement_cap = 0.04;
 const bubble = [];
 let bubble_movement_cap = 0.025;
+const blood = [];
 const food = [];
 const static_food = [];
 let food_cap = 2000;
@@ -348,7 +349,12 @@ const age_tentacle_monster = (monster_moved, integer) => {
                 monster_moved.tentacle[i].prey = {};
                 monster_moved.tentacle[i].prey_held = false;
                 for(ii = 0; ii < fish.length; ii++) {
-                    if(fish[ii].id === monster_moved.tentacle[i].prey_id) {fish.splice(ii, 1); ii = fish.length};
+                    if(fish[ii].id === monster_moved.tentacle[i].prey_id) {
+                        if(Math.random() > 0.5) new_bubbles(fish[ii].x, fish[ii].y, fish[ii].z, Math.floor(Math.random() * 2) + 1);
+                        new_blood(fish[ii].x, fish[ii].y, fish[ii].z, Math.floor(Math.random() * 10 + 10));
+                        fish.splice(ii, 1);
+                        ii = fish.length;
+                    }
                 }
                 monster_moved.starvation = 0;
                 monster_moved.food++;
@@ -393,15 +399,15 @@ const age_bubbles = () => {
         if(bubble_moved.y < -y_boundary) {bubble.splice(i, 1); i--};
     }
 }
-const draw_bubbles = () => {
-    for(let i = 0; i < bubble.length; i++) {
-        ctx_transparent.strokeStyle = `#70ffff70`;
-        let mapped = isometric_to_screen(bubble[i].x, bubble[i].y, bubble[i].z);
-        ctx_transparent.beginPath();
-        ctx_transparent.arc(mapped.x, mapped.y, bubble[i].size / 2, 0, Math.PI * 2);
-        ctx_transparent.stroke();
-    }
-}
+// const draw_bubbles = () => {
+//     for(let i = 0; i < bubble.length; i++) {
+//         ctx_transparent.strokeStyle = `#70ffff70`;
+//         let mapped = isometric_to_screen(bubble[i].x, bubble[i].y, bubble[i].z);
+//         ctx_transparent.beginPath();
+//         ctx_transparent.arc(mapped.x, mapped.y, bubble[i].size / 2, 0, Math.PI * 2);
+//         ctx_transparent.stroke();
+//     }
+// }
 const new_food = (x, y, z) => {
     let new_food_object = {x: x, y: y, z: z};
     new_food_object.movement = {x: (Math.random() * 2 - 1) * 0.01, y: (Math.random() * 2 - 1) * 0.01, z: (Math.random() * 2 - 1) * 0.01};
@@ -431,6 +437,35 @@ const age_food = (food_moved, integer) => {
 }
 const age_foods = () => {
     for(let i = 0; i < food.length; i++) age_food(food[i], i);
+}
+const new_blood = (x, y, z, quantity) => {
+    for(let i = 0; i < quantity; i++) {
+        let new_blood_object = {x: x, y: y, z: z, age: 0, velocity: Math.random() * 20 + 20, size: 300};
+        new_blood_object.movement = {x: (Math.random() * 2 - 1) * 0.004, y: (Math.random() * 2 - 1) * 0.004, z: (Math.random() * 2 - 1) * 0.004};
+        blood.push(new_blood_object);
+    }
+}
+const age_blood = (blood_moved, integer) => {
+    blood_moved.age++;
+    blood_moved.velocity *= 0.97;
+    if(blood_moved.velocity < 1) blood_moved.velocity = 1;
+    blood_moved.movement.x += (Math.random() * 2 - 1) * 0.00005;
+    blood_moved.movement.y += (Math.random() * 2 - 1) * 0.00005 + global_gravity;
+    blood_moved.movement.z += (Math.random() * 2 - 1) * 0.00005;
+    blood_moved.x += blood_moved.movement.x * blood_moved.velocity;
+    blood_moved.y += blood_moved.movement.y * blood_moved.velocity;
+    blood_moved.z += blood_moved.movement.z * blood_moved.velocity;
+    if(blood_moved.x > x_boundary) {blood_moved.x = x_boundary; blood_moved.movement.x *= 0.5};
+    if(blood_moved.x < -x_boundary) {blood_moved.x = -x_boundary; blood_moved.movement.x *= 0.5};
+    if(blood_moved.z > z_boundary) {blood_moved.z = z_boundary; blood_moved.movement.z *= 0.5};
+    if(blood_moved.z < -z_boundary) {blood_moved.z = -z_boundary; blood_moved.movement.z *= 0.5};
+    if(blood_moved.y > y_boundary) {blood_moved.y = y_boundary; blood_moved.movement.y *= 0.5};
+    if(blood_moved.y < -y_boundary) {blood_moved.y = -y_boundary; blood_moved.movement.y *= 0.5};
+    blood_moved.size -= Math.random();
+    if(blood_moved.size < 1) blood.splice(integer, 1);
+}
+const age_bloods = () => {
+    for(let i = 0; i < blood.length; i++) age_blood(blood[i], i);
 }
 // const draw_food = () => {
 //     for(let i = 0; i < food.length; i++) {
@@ -490,6 +525,7 @@ const age_fish = (fish_moved, integer) => {
         }
     }
     if(fed) {
+        fish_moved.move_cycle = 200;
         fish_moved.food++;
         fish_moved.starvation = 0;
     }
@@ -581,26 +617,42 @@ const draw_fish = (integer) => {
 const draw_water_objects = () => {
     let proximity_list = [];
     let draw_list = [];
-    for(let i = 0; i < food.length; i++) {
+    let sum_array_lengths = 0;
+    for(let i = sum_array_lengths; i < food.length; i++) {
         proximity_list[i] = Math.sqrt(Math.abs(food[i].x - x_boundary) ** 2 + Math.abs(food[i].z - -z_boundary) ** 2);
     }
-    for(let i = food.length; i < food.length + fish.length; i++) {
-        proximity_list[i] = Math.sqrt(Math.abs(fish[i - food.length].x - x_boundary) ** 2 + Math.abs(fish[i - food.length].z - -z_boundary) ** 2);
+    sum_array_lengths += food.length;
+    for(let i = sum_array_lengths; i < sum_array_lengths + fish.length; i++) {
+        let index = i - sum_array_lengths;
+        proximity_list[i] = Math.sqrt(Math.abs(fish[index].x - x_boundary) ** 2 + Math.abs(fish[index].z - -z_boundary) ** 2);
     }
-    for(let i = food.length + fish.length; i < food.length + fish.length + tentacle_monster.length; i++) {
-        proximity_list[i] = Math.sqrt(Math.abs(tentacle_monster[i - food.length - fish.length].x - x_boundary) ** 2 + Math.abs(tentacle_monster[i - food.length - fish.length].z - -z_boundary) ** 2);
+    sum_array_lengths += fish.length;
+    for(let i = sum_array_lengths; i < sum_array_lengths + tentacle_monster.length; i++) {
+        let index = i - sum_array_lengths;
+        proximity_list[i] = Math.sqrt(Math.abs(tentacle_monster[index].x - x_boundary) ** 2 + Math.abs(tentacle_monster[index].z - -z_boundary) ** 2);
     }
-    while(draw_list.length < food.length + fish.length + tentacle_monster.length) {
+    sum_array_lengths += tentacle_monster.length;
+    for(let i = sum_array_lengths; i < sum_array_lengths + blood.length; i++) {
+        let index = i - sum_array_lengths;
+        proximity_list[i] = Math.sqrt(Math.abs(blood[index].x - x_boundary) ** 2 + Math.abs(blood[index].z - -z_boundary) ** 2);
+    }
+    sum_array_lengths += blood.length;
+    for(let i = sum_array_lengths; i < sum_array_lengths + bubble.length; i++) {
+        let index = i - sum_array_lengths;
+        proximity_list[i] = Math.sqrt(Math.abs(bubble[index].x - x_boundary) ** 2 + Math.abs(bubble[index].z - -z_boundary) ** 2);
+    }
+    sum_array_lengths += bubble.length;
+    while(draw_list.length < sum_array_lengths) {
         let closest = 0;
-        let closest_creature = 0;
+        let closest_thing = 0;
         for(let i = 0; i < proximity_list.length; i++) {
             if(proximity_list[i] > closest) {
                 closest = proximity_list[i];
-                closest_creature = i;
+                closest_thing = i;
             }
         }
-        draw_list.push(closest_creature);
-        proximity_list[closest_creature] = 0;
+        draw_list.push(closest_thing);
+        proximity_list[closest_thing] = 0;
     }
     for(let i = 0; i < draw_list.length; i++) {
         let integer = draw_list[i];
@@ -610,8 +662,20 @@ const draw_water_objects = () => {
             ctx_transparent.fillRect(mapped.x, mapped.y, 1, 1);
         } else if(integer < food.length + fish.length) {
             draw_fish(integer - food.length);
-        } else {
+        } else if(integer < food.length + fish.length + tentacle_monster.length) {
             draw_tentacle_monster(integer - food.length - fish.length);
+        } else if(integer < food.length + fish.length + tentacle_monster.length + blood.length) {
+            let index = integer - food.length - fish.length - tentacle_monster.length;
+            ctx_transparent.fillStyle = `#e22`;
+            let mapped = isometric_to_screen(blood[index].x, blood[index].y, blood[index].z);
+            ctx_transparent.fillRect(mapped.x - blood[index].size / 200, mapped.y - blood[index].size / 200, blood[index].size / 100, blood[index].size / 100);
+        } else {
+            let index = integer - food.length - fish.length - tentacle_monster.length - blood.length;
+            ctx_transparent.strokeStyle = `#70ffff70`;
+            let mapped = isometric_to_screen(bubble[index].x, bubble[index].y, bubble[index].z);
+            ctx_transparent.beginPath();
+            ctx_transparent.arc(mapped.x, mapped.y, bubble[index].size / 2, 0, Math.PI * 2);
+            ctx_transparent.stroke();
         }
     }
 }
@@ -973,6 +1037,7 @@ const sub_time = () => {
     }
     for(let zips = 0; zips < global_time_speed; zips++) {
         age_foods();
+        age_bloods();
         age_tentacle_monsters();
         age_fishes();
         age_snails();
@@ -991,7 +1056,7 @@ const sub_time = () => {
     // draw_food();
     draw_water_objects();
     // draw_tentacle_monsters();
-    draw_bubbles();
+    // draw_bubbles();
     draw_global_wireframe_front();
 }
 const time = () => {
