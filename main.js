@@ -20,22 +20,22 @@ let shell_s_png = document.getElementById(`shell5_png`);
 let shell_w_png = document.getElementById(`shell6_png`);
 let shell_n_png = document.getElementById(`shell7_png`);
 let shell_e_png = document.getElementById(`shell8_png`);
-let fish_sw_png = document.getElementById(`fish1_png`);
-let fish_se_png = document.getElementById(`fish2_png`);
-let fish_nw_png = document.getElementById(`fish3_png`);
-let fish_ne_png = document.getElementById(`fish4_png`);
-let fish_w_png = document.getElementById(`fish5_png`);
-let fish_e_png = document.getElementById(`fish6_png`);
-let fish_s_png = document.getElementById(`fish7_png`);
-let fish_n_png = document.getElementById(`fish8_png`);
-let fish_sw_flip_png = document.getElementById(`fish1flip_png`);
-let fish_se_flip_png = document.getElementById(`fish2flip_png`);
-let fish_nw_flip_png = document.getElementById(`fish3flip_png`);
-let fish_ne_flip_png = document.getElementById(`fish4flip_png`);
-let fish_w_flip_png = document.getElementById(`fish5flip_png`);
-let fish_e_flip_png = document.getElementById(`fish6flip_png`);
-let fish_s_flip_png = document.getElementById(`fish7flip_png`);
-let fish_n_flip_png = document.getElementById(`fish8flip_png`);
+let minnow_sw_png = document.getElementById(`minnow1_png`);
+let minnow_se_png = document.getElementById(`minnow2_png`);
+let minnow_nw_png = document.getElementById(`minnow3_png`);
+let minnow_ne_png = document.getElementById(`minnow4_png`);
+let minnow_w_png = document.getElementById(`minnow5_png`);
+let minnow_e_png = document.getElementById(`minnow6_png`);
+let minnow_s_png = document.getElementById(`minnow7_png`);
+let minnow_n_png = document.getElementById(`minnow8_png`);
+let minnow_sw_flip_png = document.getElementById(`minnow1flip_png`);
+let minnow_se_flip_png = document.getElementById(`minnow2flip_png`);
+let minnow_nw_flip_png = document.getElementById(`minnow3flip_png`);
+let minnow_ne_flip_png = document.getElementById(`minnow4flip_png`);
+let minnow_w_flip_png = document.getElementById(`minnow5flip_png`);
+let minnow_e_flip_png = document.getElementById(`minnow6flip_png`);
+let minnow_s_flip_png = document.getElementById(`minnow7flip_png`);
+let minnow_n_flip_png = document.getElementById(`minnow8flip_png`);
 let piranha_sw_png = document.getElementById(`piranha1_png`);
 let piranha_se_png = document.getElementById(`piranha2_png`);
 let piranha_nw_png = document.getElementById(`piranha3_png`);
@@ -44,6 +44,7 @@ let piranha_w_png = document.getElementById(`piranha5_png`);
 let piranha_e_png = document.getElementById(`piranha6_png`);
 let piranha_s_png = document.getElementById(`piranha7_png`);
 let piranha_n_png = document.getElementById(`piranha8_png`);
+// let piranha_n_from_bottom_png = document.getElementById(`piranha9_png`);
 let piranha_sw_flip_png = document.getElementById(`piranha1flip_png`);
 let piranha_se_flip_png = document.getElementById(`piranha2flip_png`);
 let piranha_nw_flip_png = document.getElementById(`piranha3flip_png`);
@@ -52,6 +53,7 @@ let piranha_w_flip_png = document.getElementById(`piranha5flip_png`);
 let piranha_e_flip_png = document.getElementById(`piranha6flip_png`);
 let piranha_s_flip_png = document.getElementById(`piranha7flip_png`);
 let piranha_n_flip_png = document.getElementById(`piranha8flip_png`);
+// let piranha_n_from_bottom_flip_png = document.getElementById(`piranha9flip_png`);
 //
 ctx_opaque.translate(0.5, 0.5);
 ctx_opaque.lineWidth = 1;
@@ -82,11 +84,11 @@ const blood = [];
 const food = [];
 const static_food = [];
 let food_cap = 2000;
-const fish = [];
-let fish_food_requirement = 10;
-let fish_starvation_cap = 2000000;
-let fish_movement_cap = 0.03;
-let fish_cap = 500;
+const minnow = [];
+let minnow_food_requirement = 10;
+let minnow_starvation_cap = 2000000;
+let minnow_movement_cap = 0.03;
+let minnow_cap = 500;
 const piranha = [];
 let piranha_food_requirement = 10;
 let piranha_starvation_cap = 1000000;
@@ -138,18 +140,18 @@ const fit_canvas = () => {
 const reskew = (value) => {
     global_angle = value;
     if(global_angle > 0) {
-        fish_sw_png = document.getElementById(`fish1_png`);
-        fish_se_png = document.getElementById(`fish2_png`);
-        fish_nw_png = document.getElementById(`fish3_png`);
-        fish_ne_png = document.getElementById(`fish4_png`);
-        fish_sw_flip_png = document.getElementById(`fish1flip_png`);
-        fish_se_flip_png = document.getElementById(`fish2flip_png`);
-        fish_nw_flip_png = document.getElementById(`fish3flip_png`);
-        fish_ne_flip_png = document.getElementById(`fish4flip_png`);
-        fish_s_png = document.getElementById(`fish7_png`);
-        fish_n_png = document.getElementById(`fish8_png`);
-        fish_s_flip_png = document.getElementById(`fish7flip_png`);
-        fish_n_flip_png = document.getElementById(`fish8flip_png`);
+        minnow_sw_png = document.getElementById(`minnow1_png`);
+        minnow_se_png = document.getElementById(`minnow2_png`);
+        minnow_nw_png = document.getElementById(`minnow3_png`);
+        minnow_ne_png = document.getElementById(`minnow4_png`);
+        minnow_sw_flip_png = document.getElementById(`minnow1flip_png`);
+        minnow_se_flip_png = document.getElementById(`minnow2flip_png`);
+        minnow_nw_flip_png = document.getElementById(`minnow3flip_png`);
+        minnow_ne_flip_png = document.getElementById(`minnow4flip_png`);
+        minnow_s_png = document.getElementById(`minnow7_png`);
+        minnow_n_png = document.getElementById(`minnow8_png`);
+        minnow_s_flip_png = document.getElementById(`minnow7flip_png`);
+        minnow_n_flip_png = document.getElementById(`minnow8flip_png`);
         piranha_sw_png = document.getElementById(`piranha1_png`);
         piranha_se_png = document.getElementById(`piranha2_png`);
         piranha_nw_png = document.getElementById(`piranha3_png`);
@@ -163,18 +165,18 @@ const reskew = (value) => {
         piranha_s_flip_png = document.getElementById(`piranha7flip_png`);
         piranha_n_flip_png = document.getElementById(`piranha8flip_png`);
     } else {
-        fish_nw_png = document.getElementById(`fish1_png`);
-        fish_ne_png = document.getElementById(`fish2_png`);
-        fish_sw_png = document.getElementById(`fish3_png`);
-        fish_se_png = document.getElementById(`fish4_png`);
-        fish_nw_flip_png = document.getElementById(`fish1flip_png`);
-        fish_ne_flip_png = document.getElementById(`fish2flip_png`);
-        fish_sw_flip_png = document.getElementById(`fish3flip_png`);
-        fish_se_flip_png = document.getElementById(`fish4flip_png`);
-        fish_n_png = document.getElementById(`fish7_png`);
-        fish_s_png = document.getElementById(`fish8_png`);
-        fish_n_flip_png = document.getElementById(`fish7flip_png`);
-        fish_s_flip_png = document.getElementById(`fish8flip_png`);
+        minnow_nw_png = document.getElementById(`minnow1_png`);
+        minnow_ne_png = document.getElementById(`minnow2_png`);
+        minnow_sw_png = document.getElementById(`minnow3_png`);
+        minnow_se_png = document.getElementById(`minnow4_png`);
+        minnow_nw_flip_png = document.getElementById(`minnow1flip_png`);
+        minnow_ne_flip_png = document.getElementById(`minnow2flip_png`);
+        minnow_sw_flip_png = document.getElementById(`minnow3flip_png`);
+        minnow_se_flip_png = document.getElementById(`minnow4flip_png`);
+        minnow_n_png = document.getElementById(`minnow7_png`);
+        minnow_s_png = document.getElementById(`minnow8_png`);
+        minnow_n_flip_png = document.getElementById(`minnow7flip_png`);
+        minnow_s_flip_png = document.getElementById(`minnow8flip_png`);
         piranha_nw_png = document.getElementById(`piranha1_png`);
         piranha_ne_png = document.getElementById(`piranha2_png`);
         piranha_sw_png = document.getElementById(`piranha3_png`);
@@ -183,10 +185,10 @@ const reskew = (value) => {
         piranha_ne_flip_png = document.getElementById(`piranha2flip_png`);
         piranha_sw_flip_png = document.getElementById(`piranha3flip_png`);
         piranha_se_flip_png = document.getElementById(`piranha4flip_png`);
-        piranha_n_png = document.getElementById(`piranha7_png`);
-        piranha_s_png = document.getElementById(`piranha8_png`);
-        piranha_n_flip_png = document.getElementById(`piranha7flip_png`);
-        piranha_s_flip_png = document.getElementById(`piranha8flip_png`);
+        piranha_n_png = document.getElementById(`piranha9_png`);
+        piranha_s_png = document.getElementById(`piranha10_png`);
+        piranha_n_flip_png = document.getElementById(`piranha9flip_png`);
+        piranha_s_flip_png = document.getElementById(`piranha10flip_png`);
     }
     find_boundary_coordinates();
     draw_background();
@@ -368,17 +370,17 @@ const age_tentacle_monster = (monster_moved, integer) => {
             z: monster_moved.tentacle[i].z + monster_moved.z
         }
         if(!monster_moved.tentacle[i].prey_held) {
-            for(let ii = 0; ii < fish.length; ii++) {
+            for(let ii = 0; ii < minnow.length; ii++) {
                 let prey_already_held = false;
-                for(let iii = 0; iii < 7; iii++) {if(monster_moved.tentacle[iii].prey_id === fish[ii].id) prey_already_held = true};
-                if(!prey_already_held && Math.abs(tentacle_position.x - fish[ii].x) <= 1 && Math.abs(tentacle_position.y - fish[ii].y) <= 1 && Math.abs(tentacle_position.z - fish[ii].z) <= 1) {
-                    let distance_from_fish = isometric_distance(tentacle_position.x, tentacle_position.y, tentacle_position.z, fish[ii].x, fish[ii].y, fish[ii].z);
-                    if(distance_from_fish <= 1) {
-                        monster_moved.tentacle[i].prey = fish[ii];
-                        monster_moved.tentacle[i].prey_id = fish[ii].id;
+                for(let iii = 0; iii < 7; iii++) {if(monster_moved.tentacle[iii].prey_id === minnow[ii].id) prey_already_held = true};
+                if(!prey_already_held && Math.abs(tentacle_position.x - minnow[ii].x) <= 1 && Math.abs(tentacle_position.y - minnow[ii].y) <= 1 && Math.abs(tentacle_position.z - minnow[ii].z) <= 1) {
+                    let distance_from_minnow = isometric_distance(tentacle_position.x, tentacle_position.y, tentacle_position.z, minnow[ii].x, minnow[ii].y, minnow[ii].z);
+                    if(distance_from_minnow <= 1) {
+                        monster_moved.tentacle[i].prey = minnow[ii];
+                        monster_moved.tentacle[i].prey_id = minnow[ii].id;
                         monster_moved.tentacle[i].prey_held = true;
                         i = 7;
-                        ii = fish.length;
+                        ii = minnow.length;
                     }
                 }
             }
@@ -389,16 +391,16 @@ const age_tentacle_monster = (monster_moved, integer) => {
             if(Math.abs(monster_moved.tentacle[i].x) > 0.06) monster_moved.tentacle[i].x -= Math.sign(monster_moved.tentacle[i].x) * 0.05;
             if(Math.abs(monster_moved.tentacle[i].y) > 0.06) monster_moved.tentacle[i].y -= Math.sign(monster_moved.tentacle[i].y) * 0.05;
             if(Math.abs(monster_moved.tentacle[i].z) > 0.06) monster_moved.tentacle[i].z -= Math.sign(monster_moved.tentacle[i].z) * 0.05;
-            let distance_from_fish = isometric_distance(monster_moved.x, monster_moved.y, monster_moved.z, tentacle_position.x, tentacle_position.y, tentacle_position.z);
-            if(distance_from_fish <= 1) {
+            let distance_from_minnow = isometric_distance(monster_moved.x, monster_moved.y, monster_moved.z, tentacle_position.x, tentacle_position.y, tentacle_position.z);
+            if(distance_from_minnow <= 1) {
                 monster_moved.tentacle[i].prey = {};
                 monster_moved.tentacle[i].prey_held = false;
-                for(ii = 0; ii < fish.length; ii++) {
-                    if(fish[ii].id === monster_moved.tentacle[i].prey_id) {
-                        if(Math.random() > 0.5) new_bubbles(fish[ii].x, fish[ii].y, fish[ii].z, Math.floor(Math.random() * 2) + 1);
-                        new_blood(fish[ii].x, fish[ii].y, fish[ii].z, Math.floor(Math.random() * 10 + 10));
-                        fish.splice(ii, 1);
-                        ii = fish.length;
+                for(ii = 0; ii < minnow.length; ii++) {
+                    if(minnow[ii].id === monster_moved.tentacle[i].prey_id) {
+                        if(Math.random() > 0.5) new_bubbles(minnow[ii].x, minnow[ii].y, minnow[ii].z, Math.floor(Math.random() * 2) + 1);
+                        new_blood(minnow[ii].x, minnow[ii].y, minnow[ii].z, Math.floor(Math.random() * 10 + 10));
+                        minnow.splice(ii, 1);
+                        ii = minnow.length;
                     }
                 }
                 monster_moved.starvation = 0;
@@ -525,43 +527,43 @@ const draw_static_food = (integer) => {
     ctx_static_transparent.fillRect(mapped.x, mapped.y, 1, 1);
 }
 const draw_static_foods = () => {for(let i = 0; i < static_food.length; i++) draw_static_food(i)};
-const age_fish = (fish_moved, integer) => {
-    fish_moved.starvation++;
-    fish_moved.flip_cycle++;
-    fish_moved.move_cycle++;
-    if(fish_moved.flip_cycle >= 100) {
-        fish_moved.flip_cycle = Math.floor(Math.random() * 75);
-        fish_moved.flip = !fish_moved.flip;
+const age_minnow = (minnow_moved, integer) => {
+    minnow_moved.starvation++;
+    minnow_moved.flip_cycle++;
+    minnow_moved.move_cycle++;
+    if(minnow_moved.flip_cycle >= 100) {
+        minnow_moved.flip_cycle = Math.floor(Math.random() * 75);
+        minnow_moved.flip = !minnow_moved.flip;
     }
-    if(fish_moved.move_cycle >= 200) {
+    if(minnow_moved.move_cycle >= 200) {
         let food_boost = food.length;
         if(food_boost > 500) food_boost = 500;
-        fish_moved.move_cycle = Math.floor(Math.random() * -50) + Math.floor(food_boost * 0.3);
-        fish_moved.movement.x += (Math.random() * 2 - 1) * 0.001 * (food_boost * 0.3 + 1);
-        fish_moved.movement.y += (Math.random() * 2 - 1) * 0.0001 * (food_boost * 0.3 + 1);
-        fish_moved.movement.z += (Math.random() * 2 - 1) * 0.001 * (food_boost * 0.3 + 1);
+        minnow_moved.move_cycle = Math.floor(Math.random() * -50) + Math.floor(food_boost * 0.3);
+        minnow_moved.movement.x += (Math.random() * 2 - 1) * 0.001 * (food_boost * 0.3 + 1);
+        minnow_moved.movement.y += (Math.random() * 2 - 1) * 0.0001 * (food_boost * 0.3 + 1);
+        minnow_moved.movement.z += (Math.random() * 2 - 1) * 0.001 * (food_boost * 0.3 + 1);
     }
-    fish_moved.x += fish_moved.movement.x;
-    fish_moved.y += fish_moved.movement.y;
-    fish_moved.z += fish_moved.movement.z;
+    minnow_moved.x += minnow_moved.movement.x;
+    minnow_moved.y += minnow_moved.movement.y;
+    minnow_moved.z += minnow_moved.movement.z;
     ctx_opaque.fillStyle = `#44f`;
-    if(fish_moved.x > x_movement_boundary) {fish_moved.x = x_movement_boundary; fish_moved.movement.x *= 0.5};
-    if(fish_moved.x < -x_movement_boundary) {fish_moved.x = -x_movement_boundary; fish_moved.movement.x *= 0.5};
-    if(fish_moved.y > y_movement_boundary) {fish_moved.y = y_movement_boundary; fish_moved.movement.y *= 0.5};
-    if(fish_moved.y < -y_movement_boundary) {fish_moved.y = -y_movement_boundary; fish_moved.movement.y *= 0.5};
-    if(fish_moved.z > z_movement_boundary) {fish_moved.z = z_movement_boundary; fish_moved.movement.z *= 0.5};
-    if(fish_moved.z < -z_movement_boundary) {fish_moved.z = -z_movement_boundary; fish_moved.movement.z *= 0.5};
-    if(fish_moved.movement.x > fish_movement_cap) fish_moved.movement.x = fish_movement_cap;
-    if(fish_moved.movement.x < -fish_movement_cap) fish_moved.movement.x = -fish_movement_cap;
-    if(fish_moved.movement.y > fish_movement_cap) fish_moved.movement.y = fish_movement_cap;
-    if(fish_moved.movement.y < -fish_movement_cap) fish_moved.movement.y = -fish_movement_cap;
-    if(fish_moved.movement.z > fish_movement_cap) fish_moved.movement.z = fish_movement_cap;
-    if(fish_moved.movement.z < -fish_movement_cap) fish_moved.movement.z = -fish_movement_cap;
+    if(minnow_moved.x > x_movement_boundary) {minnow_moved.x = x_movement_boundary; minnow_moved.movement.x *= 0.5};
+    if(minnow_moved.x < -x_movement_boundary) {minnow_moved.x = -x_movement_boundary; minnow_moved.movement.x *= 0.5};
+    if(minnow_moved.y > y_movement_boundary) {minnow_moved.y = y_movement_boundary; minnow_moved.movement.y *= 0.5};
+    if(minnow_moved.y < -y_movement_boundary) {minnow_moved.y = -y_movement_boundary; minnow_moved.movement.y *= 0.5};
+    if(minnow_moved.z > z_movement_boundary) {minnow_moved.z = z_movement_boundary; minnow_moved.movement.z *= 0.5};
+    if(minnow_moved.z < -z_movement_boundary) {minnow_moved.z = -z_movement_boundary; minnow_moved.movement.z *= 0.5};
+    if(minnow_moved.movement.x > minnow_movement_cap) minnow_moved.movement.x = minnow_movement_cap;
+    if(minnow_moved.movement.x < -minnow_movement_cap) minnow_moved.movement.x = -minnow_movement_cap;
+    if(minnow_moved.movement.y > minnow_movement_cap) minnow_moved.movement.y = minnow_movement_cap;
+    if(minnow_moved.movement.y < -minnow_movement_cap) minnow_moved.movement.y = -minnow_movement_cap;
+    if(minnow_moved.movement.z > minnow_movement_cap) minnow_moved.movement.z = minnow_movement_cap;
+    if(minnow_moved.movement.z < -minnow_movement_cap) minnow_moved.movement.z = -minnow_movement_cap;
     // eat
     let fed = false;
     for(let ii = 0; ii < food.length; ii++) {
-        if(Math.abs(fish_moved.x - food[ii].x) <= 1 && Math.abs(fish_moved.y - food[ii].y) <= 1 && Math.abs(fish_moved.z - food[ii].z) <= 1) {
-            distance_from_food = Math.sqrt((Math.abs(fish_moved.x - food[ii].x) ** 2) + (Math.abs(fish_moved.y - food[ii].y) ** 2) + (Math.abs(fish_moved.z - food[ii].z) ** 2));
+        if(Math.abs(minnow_moved.x - food[ii].x) <= 1 && Math.abs(minnow_moved.y - food[ii].y) <= 1 && Math.abs(minnow_moved.z - food[ii].z) <= 1) {
+            distance_from_food = Math.sqrt((Math.abs(minnow_moved.x - food[ii].x) ** 2) + (Math.abs(minnow_moved.y - food[ii].y) ** 2) + (Math.abs(minnow_moved.z - food[ii].z) ** 2));
             if(distance_from_food <= 1) {
                 food.splice(ii, 1);
                 fed = true;
@@ -570,94 +572,94 @@ const age_fish = (fish_moved, integer) => {
         }
     }
     if(fed) {
-        fish_moved.move_cycle = 200;
-        fish_moved.food++;
-        fish_moved.starvation = 0;
+        minnow_moved.move_cycle = 200;
+        minnow_moved.food++;
+        minnow_moved.starvation = 0;
     }
-    if(fed && fish_moved.food >= fish_food_requirement && fish.length < fish_cap) {
-        fish_moved.food = 0;
-        new_creature(fish, 1, false, fish_moved.x, fish_moved.y, fish_moved.z);
+    if(fed && minnow_moved.food >= minnow_food_requirement && minnow.length < minnow_cap) {
+        minnow_moved.food = 0;
+        new_creature(minnow, 1, false, minnow_moved.x, minnow_moved.y, minnow_moved.z);
     }
-    if(fish_moved.starvation >= fish_starvation_cap) {
-        if(fish_moved.food > 0) {fish_moved.food--} else fish.splice(integer, 1);
+    if(minnow_moved.starvation >= minnow_starvation_cap) {
+        if(minnow_moved.food > 0) {minnow_moved.food--} else minnow.splice(integer, 1);
     }
 }
-const age_fishes = () => {
-    for(let i = 0; i < fish.length; i++) age_fish(fish[i], i);
+const age_minnowes = () => {
+    for(let i = 0; i < minnow.length; i++) age_minnow(minnow[i], i);
 }
-const draw_fish = (integer) => {
-    let mapped = isometric_to_screen(fish[integer].x, fish[integer].y, fish[integer].z);
-    let fish_image;
-    if(fish[integer].movement.x <= 0) {
-        if(fish[integer].movement.z <= 0) {
-            if(fish[integer].movement.x / fish[integer].movement.z <= 1) {
+const draw_minnow = (integer) => {
+    let mapped = isometric_to_screen(minnow[integer].x, minnow[integer].y, minnow[integer].z);
+    let minnow_image;
+    if(minnow[integer].movement.x <= 0) {
+        if(minnow[integer].movement.z <= 0) {
+            if(minnow[integer].movement.x / minnow[integer].movement.z <= 1) {
                 // east
-                if(fish[integer].flip) {
-                    fish_image = fish_e_flip_png;
+                if(minnow[integer].flip) {
+                    minnow_image = minnow_e_flip_png;
                 } else {
-                    fish_image = fish_e_png;
+                    minnow_image = minnow_e_png;
                 }
             } else {
                 // north east
-                if(fish[integer].flip) {
-                    fish_image = fish_ne_flip_png;
+                if(minnow[integer].flip) {
+                    minnow_image = minnow_ne_flip_png;
                 } else {
-                    fish_image = fish_ne_png;
+                    minnow_image = minnow_ne_png;
                 }
             }
         } else {
-            if(fish[integer].movement.x / fish[integer].movement.z <= -1) {
+            if(minnow[integer].movement.x / minnow[integer].movement.z <= -1) {
                 // north
-                if(fish[integer].flip) {
-                    fish_image = fish_n_flip_png;
+                if(minnow[integer].flip) {
+                    minnow_image = minnow_n_flip_png;
                 } else {
-                    fish_image = fish_n_png;
+                    minnow_image = minnow_n_png;
                 }
             } else {
                 // north west
-                if(fish[integer].flip) {
-                    fish_image = fish_nw_flip_png;
+                if(minnow[integer].flip) {
+                    minnow_image = minnow_nw_flip_png;
                 } else {
-                    fish_image = fish_nw_png;
+                    minnow_image = minnow_nw_png;
                 }
             }
         }
     } else {
-        if(fish[integer].movement.z <= 0) {
-            if(fish[integer].movement.x / fish[integer].movement.z <= -1) {
+        if(minnow[integer].movement.z <= 0) {
+            if(minnow[integer].movement.x / minnow[integer].movement.z <= -1) {
                 // south
-                if(fish[integer].flip) {
-                    fish_image = fish_s_flip_png;
+                if(minnow[integer].flip) {
+                    minnow_image = minnow_s_flip_png;
                 } else {
-                    fish_image = fish_s_png;
+                    minnow_image = minnow_s_png;
                 }
             } else {
                 // south east
-                if(fish[integer].flip) {
-                    fish_image = fish_se_flip_png;
+                if(minnow[integer].flip) {
+                    minnow_image = minnow_se_flip_png;
                 } else {
-                    fish_image = fish_se_png;
+                    minnow_image = minnow_se_png;
                 }
             }
         } else {
-            if(fish[integer].movement.x / fish[integer].movement.z <= 1) {
+            if(minnow[integer].movement.x / minnow[integer].movement.z <= 1) {
                 // west
-                if(fish[integer].flip) {
-                    fish_image = fish_w_flip_png;
+                if(minnow[integer].flip) {
+                    minnow_image = minnow_w_flip_png;
                 } else {
-                    fish_image = fish_w_png;
+                    minnow_image = minnow_w_png;
                 }
             } else {
                 // south west
-                if(fish[integer].flip) {
-                    fish_image = fish_sw_flip_png;
+                if(minnow[integer].flip) {
+                    minnow_image = minnow_sw_flip_png;
                 } else {
-                    fish_image = fish_sw_png;
+                    minnow_image = minnow_sw_png;
                 }
             }
         }
     }
-    ctx_transparent.drawImage(fish_image, mapped.x - 16, mapped.y - 16);
+    ctx_transparent.drawImage(minnow_image, mapped.x - 16, mapped.y - 16);
 }
 const age_piranha = (piranha_moved, integer) => {
     piranha_moved.starvation++;
@@ -668,7 +670,7 @@ const age_piranha = (piranha_moved, integer) => {
         piranha_moved.flip = !piranha_moved.flip;
     }
     if(piranha_moved.move_cycle >= 200) {
-        let food_boost = fish.length;
+        let food_boost = minnow.length;
         if(food_boost > 500) food_boost = 500;
         piranha_moved.move_cycle = Math.floor(Math.random() * -50) + Math.floor(food_boost * 0.3);
         piranha_moved.movement.x += (Math.random() * 2 - 1) * 0.005 * (food_boost * 0.3 + 1);
@@ -693,13 +695,13 @@ const age_piranha = (piranha_moved, integer) => {
     if(piranha_moved.movement.z < -piranha_movement_cap) piranha_moved.movement.z = -piranha_movement_cap;
     // eat
     let fed = false;
-    for(let ii = 0; ii < fish.length; ii++) {
-        if(Math.abs(piranha_moved.x - fish[ii].x) <= 1 && Math.abs(piranha_moved.y - fish[ii].y) <= 1 && Math.abs(piranha_moved.z - fish[ii].z) <= 1) {
-            distance_from_fish = Math.sqrt((Math.abs(piranha_moved.x - fish[ii].x) ** 2) + (Math.abs(piranha_moved.y - fish[ii].y) ** 2) + (Math.abs(piranha_moved.z - fish[ii].z) ** 2));
-            if(distance_from_fish <= 1) {
-                if(Math.random() > 0.5) new_bubbles(fish[ii].x, fish[ii].y, fish[ii].z, Math.floor(Math.random() * 2) + 1);
-                new_blood(fish[ii].x, fish[ii].y, fish[ii].z, Math.floor(Math.random() * 10 + 10));
-                fish.splice(ii, 1);
+    for(let ii = 0; ii < minnow.length; ii++) {
+        if(Math.abs(piranha_moved.x - minnow[ii].x) <= 1 && Math.abs(piranha_moved.y - minnow[ii].y) <= 1 && Math.abs(piranha_moved.z - minnow[ii].z) <= 1) {
+            distance_from_minnow = Math.sqrt((Math.abs(piranha_moved.x - minnow[ii].x) ** 2) + (Math.abs(piranha_moved.y - minnow[ii].y) ** 2) + (Math.abs(piranha_moved.z - minnow[ii].z) ** 2));
+            if(distance_from_minnow <= 1) {
+                if(Math.random() > 0.5) new_bubbles(minnow[ii].x, minnow[ii].y, minnow[ii].z, Math.floor(Math.random() * 2) + 1);
+                new_blood(minnow[ii].x, minnow[ii].y, minnow[ii].z, Math.floor(Math.random() * 10 + 10));
+                minnow.splice(ii, 1);
                 fed = true;
                 ii--;
             }
@@ -803,11 +805,11 @@ const draw_water_objects = () => {
         proximity_list[i] = Math.sqrt(Math.abs(food[i].x - x_boundary) ** 2 + Math.abs(food[i].z - -z_boundary) ** 2);
     }
     sum_array_lengths += food.length;
-    for(let i = sum_array_lengths; i < sum_array_lengths + fish.length; i++) {
+    for(let i = sum_array_lengths; i < sum_array_lengths + minnow.length; i++) {
         let index = i - sum_array_lengths;
-        proximity_list[i] = Math.sqrt(Math.abs(fish[index].x - x_boundary) ** 2 + Math.abs(fish[index].z - -z_boundary) ** 2);
+        proximity_list[i] = Math.sqrt(Math.abs(minnow[index].x - x_boundary) ** 2 + Math.abs(minnow[index].z - -z_boundary) ** 2);
     }
-    sum_array_lengths += fish.length;
+    sum_array_lengths += minnow.length;
     for(let i = sum_array_lengths; i < sum_array_lengths + tentacle_monster.length; i++) {
         let index = i - sum_array_lengths;
         proximity_list[i] = Math.sqrt(Math.abs(tentacle_monster[index].x - x_boundary) ** 2 + Math.abs(tentacle_monster[index].z - -z_boundary) ** 2);
@@ -846,24 +848,24 @@ const draw_water_objects = () => {
             ctx_transparent.fillStyle = `#ff0`;
             let mapped = isometric_to_screen(food[integer].x, food[integer].y, food[integer].z);
             ctx_transparent.fillRect(mapped.x, mapped.y, 1, 1);
-        } else if(integer < food.length + fish.length) {
-            draw_fish(integer - food.length);
-        } else if(integer < food.length + fish.length + tentacle_monster.length) {
-            draw_tentacle_monster(integer - food.length - fish.length);
-        } else if(integer < food.length + fish.length + tentacle_monster.length + blood.length) {
-            let index = integer - food.length - fish.length - tentacle_monster.length;
+        } else if(integer < food.length + minnow.length) {
+            draw_minnow(integer - food.length);
+        } else if(integer < food.length + minnow.length + tentacle_monster.length) {
+            draw_tentacle_monster(integer - food.length - minnow.length);
+        } else if(integer < food.length + minnow.length + tentacle_monster.length + blood.length) {
+            let index = integer - food.length - minnow.length - tentacle_monster.length;
             ctx_transparent.fillStyle = `#e22`;
             let mapped = isometric_to_screen(blood[index].x, blood[index].y, blood[index].z);
             ctx_transparent.fillRect(mapped.x - blood[index].size / 200, mapped.y - blood[index].size / 200, blood[index].size / 100, blood[index].size / 100);
-        } else if(integer < food.length + fish.length + tentacle_monster.length + blood.length + bubble.length) {
-            let index = integer - food.length - fish.length - tentacle_monster.length - blood.length;
+        } else if(integer < food.length + minnow.length + tentacle_monster.length + blood.length + bubble.length) {
+            let index = integer - food.length - minnow.length - tentacle_monster.length - blood.length;
             ctx_transparent.strokeStyle = `#70ffff70`;
             let mapped = isometric_to_screen(bubble[index].x, bubble[index].y, bubble[index].z);
             ctx_transparent.beginPath();
             ctx_transparent.arc(mapped.x, mapped.y, bubble[index].size / 2, 0, Math.PI * 2);
             ctx_transparent.stroke();
-        } else if(integer < food.length + fish.length + tentacle_monster.length + blood.length + bubble.length + piranha.length) {
-            let index = integer - food.length - fish.length - tentacle_monster.length - blood.length - bubble.length;
+        } else if(integer < food.length + minnow.length + tentacle_monster.length + blood.length + bubble.length + piranha.length) {
+            let index = integer - food.length - minnow.length - tentacle_monster.length - blood.length - bubble.length;
             draw_piranha(index);
         }
     }
@@ -871,7 +873,7 @@ const draw_water_objects = () => {
 random_isometric = (boundary) => {return Math.random() * boundary * 2 - boundary};
 const new_creature = (array, quantity, random, x, y, z) => {
     for(let i = 0; i < quantity; i++) {
-        if(array === fish) {
+        if(array === minnow) {
             let movement_x = (Math.random() * 2 - 1) * 0.01;
             let movement_y = (Math.random() * 2 - 1) * 0.001;
             let movement_z = (Math.random() * 2 - 1) * 0.01;
@@ -882,8 +884,8 @@ const new_creature = (array, quantity, random, x, y, z) => {
                 new_creature_object.z = random_isometric(z_boundary);
             }
             new_creature_object.move_cycle -= Math.floor(Math.random() * -50);
-            new_creature_object.starvation += Math.floor(Math.random() * fish_starvation_cap * 0.5);
-            fish.push(new_creature_object);
+            new_creature_object.starvation += Math.floor(Math.random() * minnow_starvation_cap * 0.5);
+            minnow.push(new_creature_object);
         }
         if(array === piranha) {
             let movement_x = (Math.random() * 2 - 1) * 0.05;
@@ -1206,14 +1208,14 @@ const cursor_select = () => {
     let selected_object = 0;
     let selected_array = [];
     let shortest_distance = Infinity;
-    for(let i = 0; i < fish.length; i++) {
-        let position = isometric_to_screen(fish[i].x, fish[i].y, fish[i].z);
+    for(let i = 0; i < minnow.length; i++) {
+        let position = isometric_to_screen(minnow[i].x, minnow[i].y, minnow[i].z);
         position.x -= canvas.center.x;
         position.y -= canvas.center.y;
-        let fish_distance = Math.sqrt(Math.abs(position.x - cursor_x) ** 2 + Math.abs(position.y - cursor_y) ** 2);
-        if(fish_distance < shortest_distance) {
-            selected_array = fish;
-            shortest_distance = fish_distance;
+        let minnow_distance = Math.sqrt(Math.abs(position.x - cursor_x) ** 2 + Math.abs(position.y - cursor_y) ** 2);
+        if(minnow_distance < shortest_distance) {
+            selected_array = minnow;
+            shortest_distance = minnow_distance;
             selected_object = i;
         }
     }
@@ -1242,7 +1244,7 @@ const sub_time = () => {
         age_foods();
         age_bloods();
         age_tentacle_monsters();
-        age_fishes();
+        age_minnowes();
         age_piranhas();
         age_snails();
         age_bubbles();
@@ -1332,14 +1334,14 @@ const keyDown = (e) => {
 document.addEventListener(`keydown`, keyDown);
 window.addEventListener(`resize`, fit_canvas, false);
 fit_canvas();
-new_creature(piranha, 4, true);
-new_creature(fish, 128, true);
+new_creature(piranha, 5, true);
+new_creature(minnow, 45, true);
 new_creature(snail, 4, true);
-// new_creature(tentacle_monster, 3, true);
+new_creature(tentacle_monster, 1, true);
 time();
 draw_global_wireframe_back();
 
-// make a random portal appear, with a tentacle that comes out of the portal, grabs a fish, and pulls it back through
+// make a random portal appear, with a tentacle that comes out of the portal, grabs a minnow, and pulls it back through
 
 // allow player to pick up shells from dead snails for points
 
