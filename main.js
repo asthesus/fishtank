@@ -795,7 +795,7 @@ const draw_piranha = (integer) => {
             }
         }
     }
-    ctx_transparent.drawImage(piranha_image, mapped.x - 16, mapped.y - 16);
+    ctx_transparent.drawImage(piranha_image, mapped.x - 17, mapped.y - 17);
 }
 const draw_water_objects = () => {
     let proximity_list = [];
@@ -845,8 +845,10 @@ const draw_water_objects = () => {
     for(let i = 0; i < draw_list.length; i++) {
         let integer = draw_list[i];
         if(integer < food.length) {
-            ctx_transparent.fillStyle = `#ff0`;
             let mapped = isometric_to_screen(food[integer].x, food[integer].y, food[integer].z);
+            ctx_transparent.fillStyle = `#000`;
+            ctx_transparent.fillRect(mapped.x - 1, mapped.y - 1, 3, 3);
+            ctx_transparent.fillStyle = `#ff0`;
             ctx_transparent.fillRect(mapped.x, mapped.y, 1, 1);
         } else if(integer < food.length + minnow.length) {
             draw_minnow(integer - food.length);
@@ -854,15 +856,22 @@ const draw_water_objects = () => {
             draw_tentacle_monster(integer - food.length - minnow.length);
         } else if(integer < food.length + minnow.length + tentacle_monster.length + blood.length) {
             let index = integer - food.length - minnow.length - tentacle_monster.length;
-            ctx_transparent.fillStyle = `#e22`;
             let mapped = isometric_to_screen(blood[index].x, blood[index].y, blood[index].z);
+            ctx_transparent.fillStyle = `#000`;
+            ctx_transparent.fillRect(mapped.x - blood[index].size / 100, mapped.y - blood[index].size / 100, blood[index].size / 100 * 2, blood[index].size / 100 * 2);
+            ctx_transparent.fillStyle = `#e22`;
             ctx_transparent.fillRect(mapped.x - blood[index].size / 200, mapped.y - blood[index].size / 200, blood[index].size / 100, blood[index].size / 100);
         } else if(integer < food.length + minnow.length + tentacle_monster.length + blood.length + bubble.length) {
             let index = integer - food.length - minnow.length - tentacle_monster.length - blood.length;
-            ctx_transparent.strokeStyle = `#70ffff70`;
             let mapped = isometric_to_screen(bubble[index].x, bubble[index].y, bubble[index].z);
+            
             ctx_transparent.beginPath();
             ctx_transparent.arc(mapped.x, mapped.y, bubble[index].size / 2, 0, Math.PI * 2);
+            ctx_transparent.lineWidth = 4.5;
+            ctx_transparent.strokeStyle = `#000`;
+            ctx_transparent.stroke();
+            ctx_transparent.lineWidth = 1;
+            ctx_transparent.strokeStyle = `#70ffff70`;
             ctx_transparent.stroke();
         } else if(integer < food.length + minnow.length + tentacle_monster.length + blood.length + bubble.length + piranha.length) {
             let index = integer - food.length - minnow.length - tentacle_monster.length - blood.length - bubble.length;
@@ -1359,7 +1368,7 @@ fit_canvas();
 new_creature(piranha, 5, true);
 new_creature(minnow, 45, true);
 new_creature(snail, 4, true);
-new_creature(tentacle_monster, 1, true);
+// new_creature(tentacle_monster, 1, true);
 time();
 draw_global_wireframe_back();
 
