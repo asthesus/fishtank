@@ -1230,6 +1230,28 @@ const cursor_select = () => {
             selected_object = i;
         }
     }
+    for(let i = 0; i < tentacle_monster.length; i++) {
+        let position = isometric_to_screen(tentacle_monster[i].x, tentacle_monster[i].y, tentacle_monster[i].z);
+        position.x -= canvas.center.x;
+        position.y -= canvas.center.y;
+        let tentacle_monster_distance = Math.sqrt(Math.abs(position.x - cursor_x) ** 2 + Math.abs(position.y - cursor_y) ** 2);
+        if(tentacle_monster_distance < shortest_distance) {
+            selected_array = tentacle_monster;
+            shortest_distance = tentacle_monster_distance;
+            selected_object = i;
+        }
+    }
+    for(let i = 0; i < piranha.length; i++) {
+        let position = isometric_to_screen(piranha[i].x, piranha[i].y, piranha[i].z);
+        position.x -= canvas.center.x;
+        position.y -= canvas.center.y;
+        let piranha_distance = Math.sqrt(Math.abs(position.x - cursor_x) ** 2 + Math.abs(position.y - cursor_y) ** 2);
+        if(piranha_distance < shortest_distance) {
+            selected_array = piranha;
+            shortest_distance = piranha_distance;
+            selected_object = i;
+        }
+    }
     if(shortest_distance < 16) {cursor_selection = selected_array[selected_object]};
 }
 const sub_time = () => {
